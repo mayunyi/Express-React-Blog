@@ -1,0 +1,65 @@
+
+@import '../../../node_modules/highlight.js/styles/atom-one-dark.css';
+.articleConent{
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    width: 65%;
+    margin-left: 20%;
+    margin-top: 10px;
+    /*position:absolute;*/
+    background-color: #d9d9d9;
+}
+.title{
+    text-align: center;
+    margin: 10px;
+}
+.articleShow{
+    /*border: 1px solid #d9d9d9;*/
+    width: 90%;
+    margin-left: 5%;
+}
+
+.data{
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.header{
+    height:60px;
+    background:#e6f7ff;
+    border: 1px solid #d9d9d9;
+}
+.l1 {
+    margin-top: 15px;
+}
+.articleShow pre {
+    background: #fafafa
+}
+.Anchor{
+    position: absolute;
+    width: 20%;
+    top: 150px;
+    padding-left: 10px;
+}
+.Anchor h1 {
+    font-size: 20px;
+    text-align: center;
+}
+
+h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+h1 {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}

@@ -1,0 +1,13 @@
+.about-me{
+    width: 100%;
+    text-align: center;
+    margin: 20px 0px;
+}
+.about-me ul{
+    padding-inline-start: 0px
+}
+.about-me li {
+    list-style-type:none;
+    font-size: 16px;
+    line-height: 45px;
+}

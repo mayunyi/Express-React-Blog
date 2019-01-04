@@ -1,0 +1,77 @@
+
+.ant-carousel .slick-slide {
+    text-align: center;
+    height: 160px;
+    line-height: 160px;
+    background: #000000;
+    overflow: hidden;
+}
+
+.ant-carousel .slick-slide  {
+    color: #fff;
+}
+
+
+.tags{
+    background: #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    width:15%;
+    float: left;
+    border:1px solid rgba(0, 0, 0, 0.45);
+    margin-left: 5%;
+}
+.articleList{
+    border:1px solid rgba(0, 0, 0, 0.45);
+    margin: 50px 15%;
+}
+.articleList-item{
+    margin: 20px;
+}
+
+.tagsUi{
+    font-size: 18px;
+    font-weight: bold;
+    padding:5px;
+}
+.tagsli {
+    list-style: none;
+    display: inline;
+    padding-left: 10px;
+}
+/**
+    文章列表显示内容，大于自定宽度使用省略号
+ */
+.articleListItem{
+    text-indent: 2em;
+    width:98%;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+
+
+/**
+    文章分页器css
+ */
+.page{
+    margin-right: 20px;
+    text-align: right;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/***
+    无状态组件布局
+ */
+.funlist{
+    padding-right: 200px;
+    padding-left: 200px;
+    padding-bottom: 20px;
+}
+h1 {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+}

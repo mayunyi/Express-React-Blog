@@ -1,0 +1,17 @@
+.imgDiv {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+.imgDiv >img{
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    border: 1px solid;
+}
+
+h2 {
+    text-align: center;
+    padding-top:10px;
+}

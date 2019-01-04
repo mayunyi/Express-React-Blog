@@ -1,0 +1,32 @@
+.header-link {
+    font-weight: bold;
+    font-size: 18px;
+    background: #e5f7ff;
+    text-align:center;
+}
+.header-link li{
+    text-decoration: none;
+    list-style: none;
+    display: inline;
+    margin-left: 100px;
+}
+.header-link li a{
+    color:#040404;
+    text-decoration: none;
+    margin:0px;
+    height:64px;
+    line-height:64px;
+    text-align:center;
+}
+.header-link li a:hover{
+    color: #fc75f4;
+}
+.header-link div {
+    float: right;
+    margin-top: 15px;
+    margin-right: 20px;
+    text-align: center;
+}
+.header-link div a {
+    margin-right: 10px;
+}

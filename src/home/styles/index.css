@@ -1,0 +1,137 @@
+
+/**
+    svg
+ */
+
+.text {
+    font-size: 200px;
+    font-family: cursive;
+}
+
+
+.svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+
+.use-text {
+    fill: none;
+    stroke: white;
+    stroke-dashoffset: 35%;
+    stroke-dasharray: 0 87.5%;
+
+    stroke-width: 2px;
+
+}
+
+.use-text:nth-child(1) {
+    stroke: #360745;
+    animation: animation1 8s infinite ease-in-out forwards;
+
+}
+.use-text:nth-child(2) {
+    stroke: #D61C59;
+    animation: animation2 8s infinite ease-in-out forwards;
+
+}
+.use-text:nth-child(3) {
+    stroke: #E7D84B;
+    animation: animation3 8s infinite ease-in-out forwards;
+
+}
+.use-text:nth-child(4) {
+    stroke: #EFEAC5;
+    animation: animation4 8s infinite ease-in-out forwards;
+
+}
+.use-text:nth-child(5) {
+    stroke: #1B8798;
+    animation: animation5 8s infinite ease-in-out forwards;
+
+}
+
+@keyframes animation1 {
+    50%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 7%;
+    }
+    70%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 7%;
+    }
+}
+@keyframes animation2 {
+    50%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 14%;
+    }
+    70%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 14%;
+    }
+}
+@keyframes animation3 {
+    50%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 21%;
+    }
+    70%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 21%;
+    }
+}
+@keyframes animation4 {
+    50%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 28%;
+    }
+    70%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 28%;
+    }
+}
+@keyframes animation5 {
+    50%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 35%;
+    }
+    70%{
+        stroke-dasharray: 7% 28%;
+        stroke-dashoffset: 35%;
+    }
+}
+
+
+/***
+路由跳转
+ */
+
+.routerDiv{
+    font-weight: bold;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:0.95em;
+    transition:color 0.2s;
+    position: absolute;
+    top:75%;
+    width:100%;
+    text-align: center;
+}
+.routerLink{
+    float: left;
+    border:2px solid;
+    border-radius:1.85em;
+    padding:1em 2em;
+    /*width: 50px;*/
+    cursor:pointer;
+    background: white;
+    margin-right: 5%;
+}
+.fistLink {
+    margin-left: 33%;
+}
+.routerLink:hover {
+    color: #ffbdd9;
+}
