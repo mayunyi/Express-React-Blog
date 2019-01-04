@@ -13,13 +13,19 @@ import '../styles/list.css'
 const FunListArtlice = (props) =>{
     const listData = [];
     for (let i = 0; i < props.articleList.length; i++) {
-        let content = props.articleList[i].articleContent.substring(0,100);
         listData.push({
-            articleId: props.articleList[i].articleId,
-            articleTitle: props.articleList[i].articleTitle,
-            description: '努力做好每一遍有意义的文章。',
-            content: content.concat('...'),
-            Marks:props.articleList[i].Marks,
+            id: props.articleList[i]._id,
+            articleTitle: props.articleList[i].Title,
+            description: props.articleList[i].dec,
+            content: props.articleList[i].content,
+            fengImg: props.articleList[i].img,
+            likenum:props.articleList[i].likenum,
+            messnum:props.articleList[i].messnum,
+            upnum:props.articleList[i].upnum,
+            tags:props.articleList[i].tags,
+            writer:props.articleList[i].writer,
+            writerId:props.articleList[i].writerId,
+            date:props.articleList[i].date,
         });
     }
     const IconText = ({ type, text }) => (
@@ -35,40 +41,42 @@ const FunListArtlice = (props) =>{
                 size="large"
                 pagination={{
                     onChange: (page) => {
-                        console.log(page);
-                        props.getList(page)
+                        props.getList(page,20)
                     },
                     pageSize: 20,
+                    total:props.toatl
                 }}
                 dataSource={listData}
                 renderItem={item => (
                     <List.Item
-                        key={item.title}
+                        key={item.id}
                         actions={
-                            [<IconText type="star-o" text="156" />,
-                                <IconText type="like-o" text="156" />,
-                                <IconText type="message" text="2" />]
+                            [
+                                <IconText type="star-o" text={item.upnum} />,
+                                <IconText type="like-o" text={item.likenum} />,
+                                <IconText type="message" text={item.messnum} />
+                            ]
                         }
                         extra={
                             <img
-                                width={272}
+                                width={200}
                                 alt="logo"
-                                src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                                src={item.fengImg}
                             />
                         }
                     >
                         <List.Item.Meta
                             title={
                                 <div>
-                                    <Link to={"/artile/"+item.articleId}>
+                                    <Link to={"/artile/"+item.id}>
                                         <h1 > {item.articleTitle}</h1>
                                     </Link>
                                     {
-                                        item.Marks && item.Marks.length>0 && <Icon type="tag" theme="outlined" />
+                                        item.tags && item.tags.length>0 && <Icon type="tag" theme="outlined" />
                                     }
                                     {
-                                        item.Marks.map((s,index)=>{
-                                            return <Tag color="magenta" key = {index}>{s.markName}</Tag>
+                                        item.tags.map((s,index)=>{
+                                            return <Tag color="magenta" key = {index}>{s}</Tag>
                                         })
                                     }
                                 </div>

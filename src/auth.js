@@ -10,29 +10,29 @@ export default () => {
 
 export const getUser = () => {
     return {
-        userName: cookie('userName'),
-        userId: cookie('userId'),
-        userAccount: cookie('userAccount'),
-        userPhone: cookie('userPhone'),
-        userPicture:cookie('userPicture'),
-        userMail:cookie('userMail')
+        userName: cookie('id'),
+        userId: cookie('email'),
+        userAccount: cookie('identity'),
+        userPhone: cookie('name'),
+        userPicture:cookie('avatar'),
+        userMail:cookie('token'),
     };
 };
 
-export const setUser = (userName, userId, userAccount, userPhone,userPicture,userMail) => {
-    cookie('userName', userName);
-    cookie('userId', userId);
-    cookie('userAccount', userAccount);
-    cookie('userPhone', userPhone);
-    cookie('userPicture', userPicture);
-    cookie('userMail', userMail);
+export const setUser = (id, email, identity, name,avatar,token) => {
+    cookie('id', id);
+    cookie('email', email);
+    cookie('identity', identity);
+    cookie('name', name);
+    cookie('avatar', avatar);
+    cookie('token', token);
 };
 
 export const clearUser = () => {
-    cookie('userName', null);
-    cookie('userId', null);
-    cookie('userAccount', null);
-    cookie('userPhone', null);
-    cookie('userPicture', null);
-    cookie('userMail', null);
+    cookie('id', null);
+    cookie('email', null);
+    cookie('identity', null);
+    cookie('name', null);
+    cookie('avatar', null);
+    cookie('token', null);
 };

@@ -31,27 +31,35 @@ class WrappedNormalLoginForm extends  Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                fetch('/blog/sign/in',{
+                fetch('/api/users/login',{
                     method:"POST",
                     mode: "cors",
-                    credentials: 'include',
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body:  JSON.stringify({userAccount:values.Username,userPassword:values.password})
+                    body:  JSON.stringify({
+                        email:values.Username,
+                        password:values.password
+                    })
                 }).then(rep=>{
                     return rep.json();
 
-                }).then(json=>{
-                    if(typeof(json) === 'string'){
-
-                    } else if (json == null){
-                        return message.error('没有该用户！')
-                    } else {
-                        const {userName, userId, userAccount, userPhone, userPicture, userMail} = json;
-                        setUser(userName, userId, userAccount, userPhone, userPicture, userMail);
-                        this.props.loginIn(true);
-                        this.props.history.push("/");
+                }).then(jsontoken=>{
+                    if(jsontoken.success){
+                        fetch('/api/users/current',{
+                            mode: "cors",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization":jsontoken.token
+                            },
+                        }).then(rep=>{
+                            return rep.json();
+                        }).then(jsonuser=>{
+                            const {id, email, identity, name, avatar} = jsonuser;
+                            setUser(id, email, identity, name, avatar, jsontoken.token);
+                            this.props.loginIn(true);
+                            this.props.history.push("/");
+                        })
                     }
                 })
             }

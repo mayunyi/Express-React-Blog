@@ -2,8 +2,8 @@ import * as constants from './constants';
 
 const defaultState = {
     articleList:[],
-    articlePage:1,
-    pages:0,
+    page:1,
+    toatl:0,
 };
 
 
@@ -12,7 +12,7 @@ export default ( state = defaultState, action) => {
 
     switch (action.type) {
         case constants.GET_ARTLICE_LIST:
-            return {...state, pages:action.pages, articleList:action.articleList, articlePage:action.articlePage};
+            return {...state, toatl:action.toatl, articleList:action.articleList, page:action.page};
         default :
             return state;
     }

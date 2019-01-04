@@ -64,8 +64,8 @@ module.exports = function (data) {			//从webpack.config.js 传过来的env参�
 	        host: 'localhost',
 	        hotOnly:true,
 	        proxy:{
-	            '/blog/*':{
-	                target: 'http://db.mayunyi.top',
+	            '/api/*':{
+	                target: 'http://localhost:5000/',
 	                changeOrigin: true,
 	                secure: false
 	            }

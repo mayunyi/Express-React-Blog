@@ -16,7 +16,7 @@ export default class List extends Component{
         super(props,context);
     }
     componentDidMount(){
-        this.props.getList(1);
+        this.props.getList();
     }
     render() {
         return (
