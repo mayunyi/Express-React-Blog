@@ -63,3 +63,45 @@ h1 {
     margin-inline-end: 0px;
     font-weight: bold;
 }
+
+.messageLayout{
+    width: 65%;
+    margin-left: 20%;
+    margin-top: 10px;
+    border: 1px solid #EBEBEB;
+    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
+    border-radius: 4px;
+}
+
+.Item{
+    position: relative;
+    flex-shrink: 0;
+    padding: 12px 20px 10px;
+    font-size: 15px;
+}
+.ItemMeta{
+    position: relative;
+    height: 24px;
+    padding-right: 3px;
+    padding-left: 1px;
+    margin-bottom: 4px;
+    line-height: 24px;
+}
+
+.messageUser{
+    display: inline;
+    padding-left: 10px;
+}
+
+.messageConnect{
+    position: relative;
+    flex-shrink: 0;
+    padding: 0px 60px 10px;
+    font-size: 15px;
+}
+
+.time{
+    float: right;
+    font-size: 14px;
+    color: #8590A6;
+}

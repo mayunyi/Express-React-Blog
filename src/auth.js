@@ -10,12 +10,12 @@ export default () => {
 
 export const getUser = () => {
     return {
-        userName: cookie('id'),
-        userId: cookie('email'),
-        userAccount: cookie('identity'),
-        userPhone: cookie('name'),
-        userPicture:cookie('avatar'),
-        userMail:cookie('token'),
+        userId: cookie('id'),
+        userEmail: cookie('email'),
+        identity: cookie('identity'),
+        userName: cookie('name'),
+        avatar:cookie('avatar'),
+        token:cookie('token'),
     };
 };
 

@@ -1,8 +1,8 @@
 import React,{Component} from 'react';
 import marked from 'marked'
 import hljs from 'highlight.js'
-import {Row,Col,Icon,BackTop,Spin} from 'antd';
-// import ArtliceMeun from "./ArtliceMeun";
+import {Row,Col,Icon,BackTop,Spin,Avatar,Divider} from 'antd';
+import MessageArtlice from "./MessageArtlice";
 
 
 const Fragment = React.Fragment;
@@ -15,6 +15,7 @@ export default class ShowArticle extends Component {
         this.state = {
             title:'',
             writer:'',
+            writerId:'',
             data:'',
             articleContent:'',
             marks:[],
@@ -27,23 +28,23 @@ export default class ShowArticle extends Component {
         });
         let local = this.props.match.params.id;
         if(local){
-            this.getIdArticle(local)
+            this.getIdArticle(local);
         }
         marked.setOptions({
             highlight: code => hljs.highlightAuto(code).value,
         });
     }
     getIdArticle(articleID){
-        fetch(`/blog/article/${articleID}`).then(rep=>{
+        fetch(`/api/articlelist/${articleID}`).then(rep=>{
             return rep.json();
         }).then(json=>{
-            let data = json.res;
             this.setState({
-                title:data.articleTitle,
-                writer:data.articleWriter,
-                data:data.createdAt ? data.createdAt.substring(0,data.createdAt.indexOf('T')):'',
-                articleContent:data.articleContent,
-                marks:data.Marks,
+                title:json.Title,
+                writer:json.writer,
+                data:json.date ? json.date.substring(0,json.date.indexOf('T')):'',
+                articleContent:json.content,
+                marks:json.tags,
+                writerId:json.writerId,
                 loading:false
             })
         })
@@ -80,11 +81,11 @@ export default class ShowArticle extends Component {
                                     <strong className="data">{this.state.data}</strong>
                                 </div>
                                 <div className='articleShow' dangerouslySetInnerHTML={{ __html: marked(this.state.articleContent)}}/>
-                                <BackTop visibilityHeight = {50}/>
                             </div>
+                            <MessageArtlice {...this.props} writerId = {this.state.writerId}/>
+                            <BackTop visibilityHeight = {50}/>
                         </Fragment>
                 }
-
             </Fragment>
 
     	)
