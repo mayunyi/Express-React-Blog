@@ -6,7 +6,6 @@ import * as constants from './constants';
 
 const defaultState = {
     login:false,
-    register:false
 };
 
 export default ( state = defaultState, action) => {
@@ -15,8 +14,6 @@ export default ( state = defaultState, action) => {
             return {...state, login:action.login};
         case constants.LOGIN_OUT:
             return {...state, login:action.login};
-        case constants.LOGIN_REGISTER:
-            return {...state, register:action.login};
         default :
             return state;
     }

@@ -16,10 +16,5 @@ export const loginOut = (result) =>({
     login:result
 });
 
-//注册
-export const loginRegister = (result) =>({
-    type: constants.LOGIN_REGISTER,
-    register:result
-});
 
 

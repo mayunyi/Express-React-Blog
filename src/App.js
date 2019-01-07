@@ -14,6 +14,7 @@ const AsyncArtileConent  = asyncComponent(() => import('./artileConent'));
 const AsyncArtliceList  = asyncComponent(() => import('./artliceList'));
 const AsyncPigeonhole  = asyncComponent(() => import('./pigeonhole'));
 const AsyncLogin  = asyncComponent(() => import('./Login'));
+const AsyncRegister  = asyncComponent(() => import('./Login/components/Register'));
 
 //判断是pc端还是移动移动端
 const isPC = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
@@ -34,6 +35,7 @@ class App extends Component {
                         <Route path='/admin' component={AsyncAdmin}/>
                         <Route path='/pigeonhole' exact component={AsyncPigeonhole}/>
                         <Route path='/login' exact component={AsyncLogin}/>
+                        <Route path='/register' exact component={AsyncRegister}/>
                     </Fragment>
                 </BrowserRouter>
             </Provider>

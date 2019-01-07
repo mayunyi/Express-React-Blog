@@ -102,7 +102,7 @@ export default class HeaderComponent extends  Component {
                             </Link>
                     }
                     {
-                        this.props.login && this.props.login ?null : <Link to='/about'><i className = 'iconfont' >&#xe62d;</i>注册</Link>
+                        this.props.login && this.props.login ?null : <Link to='/register'><i className = 'iconfont' >&#xe62d;</i>注册</Link>
                     }
 
                 </div>
