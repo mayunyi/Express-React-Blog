@@ -52,8 +52,8 @@ const FunListArtlice = (props) =>{
                         key={item.id}
                         actions={
                             [
-                                <IconText type="star-o" text={item.upnum} />,
-                                <IconText type="like-o" text={item.likenum} />,
+                                <IconText type="star-o" text={item.likenum} />,
+                                <IconText type="like-o" text={item.upnum} />,
                                 <IconText type="message" text={item.messnum} />
                             ]
                         }

@@ -105,3 +105,34 @@ h1 {
     font-size: 14px;
     color: #8590A6;
 }
+
+.btnZan {
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    border: 1px solid rgba(0, 0, 0, 0.016);
+    margin: 50px auto;
+    background: rgb(64, 169, 255);
+    cursor: pointer;
+    box-shadow: rgb(64, 169, 255) 0px 1px 20px;
+}
+
+.btnZan :hover{
+    transform: scale(1.4)
+}
+.text {
+    display: block;
+    color: rgb(255, 255, 255);
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.zanText{
+    font-size: 50px
+}
+
+.YizanText{
+    font-size: 30px
+}
