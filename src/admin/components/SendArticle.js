@@ -266,7 +266,7 @@ class SendArticle extends Component{
                         background={false} //是否显示背景的马赛克
                         rotatable={false} //是否旋转
                         crop={this._crop.bind(this)}
-                        ref='cropper'           //必须指定这个，不然不去不到getCroppedCanvas（）方法
+                        ref='cropper'           //必须指定这个，不然不去不到 getCroppedCanvas（）方法
                     />
                 </Modal>
             </Spin>

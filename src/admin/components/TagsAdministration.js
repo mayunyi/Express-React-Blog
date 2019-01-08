@@ -2,7 +2,8 @@
  * 标签管理
  */
 import React,{Component} from "react";
-import {Table,Tabs ,Divider,Modal,Input,Spin,message,Button} from 'antd'
+import {Table,Tabs ,Divider,Modal,Input,Spin,message,Button} from 'antd';
+import {getUser} from '../../auth'
 import '../styles/tags.css'
 const TabPane = Tabs.TabPane;
 export default class TagsAdministration extends Component{
@@ -14,7 +15,11 @@ export default class TagsAdministration extends Component{
             visible: false,
             editValue:{},
             spinning:false,
-            addTag:''
+            addTag:'',
+            page:1,
+            rows:20,
+            total:0,
+            pagination:{}
         };
         this.columns = [{
             title: '序号',
@@ -29,6 +34,10 @@ export default class TagsAdministration extends Component{
             dataIndex: 'creatTime',
             key: 'creatTime',
         },{
+            title: '更新时间',
+            dataIndex: 'updateTime',
+            key: 'updateTime',
+        },{
             title: '操作',
             key: 'action',
             render: (text, record) => (
@@ -41,34 +50,43 @@ export default class TagsAdministration extends Component{
         }];
     }
     componentDidMount(){
+        const {page,rows} = this.state;
         if(this.state.tabsKey === '1'){
-            this.getAllTags()
+            this.getAllTags(page,rows)
         }
     }
     //删除标签
     tagDelete(value){
+        const userInfo = getUser();
+        if(!userInfo.userId){
+            message.error('请登录账号！')
+        }
         this.setState({
             spinning:true
         });
-        fetch(`/blog/mark/${value.id}`,{
+        fetch(`/api/tags/delete/${value.id}`,{
             method:"DELETE",
             mode: "cors",
-            credentials: 'include',
+            headers:{
+                "Authorization":userInfo.token
+            }
         }).then(rep=>{
             return rep.json()
         }).then(json=>{
-            if(json.res === 1){
-                this.getAllTags();
+            if(json.status){
+                //查找第一页的数据
+                this.getAllTags(1,this.state.rows);
                 this.setState({
                     spinning:false
                 });
-                return message.success('删除标签成功！')
+                return message.success(json.msg)
             } else {
-                return message.error('删除标签失败！')
+                return message.error(json.msg)
             }
 
         })
     }
+
     //编辑方法
     tagEdit(value){
         this.setState({
@@ -76,22 +94,25 @@ export default class TagsAdministration extends Component{
             editValue:value
         });
     }
+
     //提交修改的标签并关闭对话框
     handleOk = (e) => {
         let subData = {
-            markName:this.state.editValue.tag
+            tag:this.state.editValue.tag,
+            userId:getUser().userId
         };
-        fetch(`/blog/mark/${this.state.editValue.id}/${this.state.editValue.tag}`,{
-            method:"PUT",
+        fetch(`/api/tags/edit/${this.state.editValue.id}`,{
+            method:"POST",
             mode: "cors",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization":getUser().token
             },
             body:JSON.stringify(subData)
         }).then(rep=>{
             return rep.json()
         }).then(json=>{
-            this.getAllTags();
+            this.getAllTags(this.state.page,this.state.rows);
             this.setState({
                 visible: false,
             });
@@ -99,6 +120,7 @@ export default class TagsAdministration extends Component{
         })
 
     };
+
     //关闭对话框
     handleCancel = (e) => {
         console.log(e);
@@ -106,34 +128,86 @@ export default class TagsAdministration extends Component{
             visible: false,
         });
     };
-    //获取所以得标签
-    getAllTags(){
+
+    //获取用户当前页数的标签标签
+    getAllTags(page,rows){
         if(!this.state.spinning){
             this.setState({
                 spinning:true
             });
         }
-        fetch('/blog/mark/all').then(rep=>{
+        const userInfo = getUser();
+        if(!userInfo.userId){
+            message.error('请登录账号！')
+        }
+
+        fetch(
+            `/api/tags/find?page=${page}&rows=${rows}&userId=${userInfo.userId}`,
+            {
+                mode: "cors",
+                headers:{
+                    "Authorization":userInfo.token
+                }
+            }
+        ).then(rep=>{
             return rep.json();
         }).then(json=>{
             let allTag = [];
-            for (let i =0;i<json.length;i++){
-                allTag.push({
-                    id:json[i].markId,
-                    NO:i+1,
-                    tag:json[i].markName,
-                    creatTime:json[i].createdAt.substring(0,json[i].createdAt.indexOf('T'))
-                })
+            switch (json.status){
+                case 1:
+                    this.setState({
+                        tagTable:allTag,
+                        spinning:false,
+                        page:page,
+                        rows:rows,
+                    });
+                    return message.error(json.msg);
+                case 2:     //成功状态
+                    for (let i =0;i<json.data.length;i++){
+                        allTag.push({
+                            id:json.data[i]._id,
+                            NO:i+1,
+                            tag:json.data[i].tag,
+                            creatTime:json.data[i].createTime.substring(0,json.data[i].createTime.indexOf('T')),
+                            updateTime:json.data[i].updateTime.substring(0,json.data[i].updateTime.indexOf('T')),
+                        })
+                    }
+                    this.setState({
+                        tagTable:allTag,
+                        spinning:false,
+                        total:json.total,
+                        page:page,
+                        rows:rows,
+                    });
+                    break;
+                case 0:
+                    this.setState({
+                        tagTable:allTag,
+                        spinning:false,
+                        page:page,
+                        rows:rows,
+                    });
+                    return message.error(json.msg);
+                default:
+                    this.setState({
+                        tagTable:allTag,
+                        spinning:false,
+                        page:page,
+                        rows:rows,
+                    });
+                    return message.error('获取失败！');
             }
-            this.setState({
-                tagTable:allTag,
-                spinning:false
-            })
+
+
         })
     }
+
+
     changeTabs = (value) =>{
 
     };
+
+
     //获取修改标签的名称
     patchTag(e){
         let values = {...this.state.editValue,tag:e.target.value};
@@ -141,6 +215,7 @@ export default class TagsAdministration extends Component{
             editValue:values
         })
     }
+
     //获取用户输入的值
     onAddTag = (e)=>{
         let value = e.target.value;
@@ -148,41 +223,51 @@ export default class TagsAdministration extends Component{
             addTag:value
         })
     };
+
     //提交用户创建标签的值
     onSubmitAddTag=()=>{
+        const {page,rows} = this.state;
+        const user = getUser();
+        if(!user.userId){
+            message.error('请登录账号！')
+        }
         if (this.state.addTag.indexOf('/')!= -1){
             return message.error('不能含有/斜杠字段！')
         } else if(!this.state.addTag){
             return message.error('空值不能添加！')
         } else {
-            // let formData = new FormData();
-            // formData.append("markName",this.state.addTag);
             let data = {
-                markName :this.state.addTag
+                tag :this.state.addTag,
+                userId:user.userId
             };
-            fetch(`/blog/mark/markName/${this.state.addTag}`,{
+            fetch(`/api/tags/add/`,{
                 method:"POST",
                 mode: "cors",
-                // body: formData,
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization":user.token
                 },
                 body:JSON.stringify(data)
             }).then(rep=>{
                 return rep.json();
             }).then(json=>{
-                if(json.res){
-                    this.getAllTags();
+                if(typeof json === 'object'){
+                    this.getAllTags(page,rows);
                     //创建成功后清空input的值
                     this.setState({
                         addTag:''
                     });
                     return message.success('创建标签成功！')
-                } else {
+                }else {
                     return message.success('创建标签失败！')
                 }
             })
         }
+    };
+
+    //点击分页的标签数据
+    handleTableChange = (pagination) => {
+        this.getAllTags(pagination.current,pagination.pageSize)
     };
     render(){
         return(
@@ -199,6 +284,12 @@ export default class TagsAdministration extends Component{
                                 columns={this.columns}
                                 dataSource={this.state.tagTable}
                                 rowKey={record => record.NO}
+                                pagination={{
+                                    current: this.state.page,
+                                    pageSize: this.state.rows,
+                                    total: this.state.total
+                                }}
+                                onChange={this.handleTableChange}
                             />
                         </TabPane>
                     </Tabs>
