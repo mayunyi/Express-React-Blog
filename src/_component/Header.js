@@ -4,11 +4,11 @@ import "./styles/header.css";
 import { connect } from "react-redux";
 import { getUser,clearUser } from "../auth";
 import {actionCreators} from "../Login/store";
-import { message,Avatar,Menu, Dropdown,Icon } from "antd";
-const { loginIn,loginOut,loginRegister } = actionCreators;
+import { Avatar,Menu, Dropdown,Icon } from "antd";
+const { loginIn,loginOut } = actionCreators;
 @connect(
     state =>({...state.login}),
-    { loginIn,loginOut,loginRegister }
+    { loginIn,loginOut }
 )
 export default class HeaderComponent extends  Component {
     constructor(props,context){
@@ -83,9 +83,8 @@ export default class HeaderComponent extends  Component {
                             </Link>
                     }
                     {
-                        this.props.login && this.props.login ?null : <Link to='/register'><i className = 'iconfont' >&#xe62d;</i>注册</Link>
+                        this.props.login ?null : <Link to='/register'><i className = 'iconfont' >&#xe62d;</i>注册</Link>
                     }
-
                 </div>
             </div>
         )

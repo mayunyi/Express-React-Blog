@@ -7,7 +7,7 @@ import React,{Component} from "react";
 import { Link } from 'react-router-dom';
 import { Form, Icon, Input, Button, message} from 'antd';
 import {connect} from 'react-redux';
-import FlyingBirds from '../../../public/Flying-Birds.mp4'
+import MtBaker from '../../../public/Mt_Baker.mp4'
 import '../styles/register.css'
 class Register extends  Component {
 
@@ -107,7 +107,7 @@ class Register extends  Component {
         };
         return (
             <div className="registerLaryout">
-                <video className="registerbg_video" src={FlyingBirds}  loop muted autoPlay="autoplay" width="100%" />
+                <video className="registerbg_video" src={MtBaker}  loop muted autoPlay="autoplay" width="100%" />
                 <Form onSubmit={this.handleSubmit} className="registerContainer">
                     <Form.Item
                         {...formItemLayout}
