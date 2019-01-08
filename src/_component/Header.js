@@ -2,7 +2,7 @@ import React,{Component} from "react";
 import {Link} from "react-router-dom"
 import "./styles/header.css";
 import { connect } from "react-redux";
-import { getUser,setUser } from "../auth";
+import { getUser,clearUser } from "../auth";
 import {actionCreators} from "../Login/store";
 import { message,Avatar,Menu, Dropdown,Icon } from "antd";
 const { loginIn,loginOut,loginRegister } = actionCreators;
@@ -22,30 +22,11 @@ export default class HeaderComponent extends  Component {
     }
 
     LoginHeader = () =>{
-        fetch('/blog/sign/out',{
-            method:"POST",
-            mode: "cors",
-        }).then(rep=>{
-            return rep.json();
-        }).then(json=>{
-            if(json.res === '退出成功'){
-                setUser({
-                    userName:null,
-                    userId:null,
-                    userAccount:null,
-                    userPhone:null,
-                    userPicture:null,
-                    userMail:null,
-                });
-                if(this.props.location.pathname = '/admin'){
-                    this.props.history.push('/')
-                }
-                this.props.loginOut(false)
-            } else {
-                message.error('退出登录失败!')
-            }
-
-        })
+        clearUser();
+        if(this.props.location.pathname = '/admin'){
+            this.props.history.push('/')
+        }
+        this.props.loginOut(false)
     };
     handleMenuClick =(e) =>{
         switch (e.key) {
@@ -92,7 +73,7 @@ export default class HeaderComponent extends  Component {
                     {
                         this.props.login ?
                             <Dropdown overlay={menu}>
-                                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                                <Avatar src={getUser().avatar} />
                             </Dropdown>
 
                             :

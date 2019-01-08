@@ -22,6 +22,9 @@ class Register extends  Component {
     //自定义密码校验
     validateToNextPassword = (rule, value, callback) => {
         const form = this.props.form;
+        if(value && value.length <6 ){
+            callback('密码长度必须大于或等于6位数！');
+        }
         if (value && this.state.confirmDirty) {
             form.validateFields(['confirm'], { force: true });
         }
@@ -42,7 +45,40 @@ class Register extends  Component {
     handleConfirmBlur = (e) => {
         const value = e.target.value;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
-    }
+    };
+
+
+    //注册事件
+    handleSubmit = (e) =>{
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                let registerObj = {
+                    name:values.name,
+                    email:values.email,
+                    password:values.password,
+                    //avatar:'//p3a.pstatp.com/weili/l/79054095780074136.jpg'
+                };
+                fetch('/api/users/register',{
+                    method:"POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body:  JSON.stringify(registerObj)
+                }).then(rep=>{
+                    return rep.json()
+                }).then(json=>{
+                    if(typeof json === 'object'){
+                        this.props.history.push("/login");
+                        message.success('注册成功！')
+                    } else {
+                        message.error(json)
+                    }
+                })
+            }
+        });
+    };
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -56,6 +92,7 @@ class Register extends  Component {
                 sm: { span: 16 },
             },
         };
+
         const tailFormItemLayout = {
             wrapperCol: {
                 xs: {
@@ -74,7 +111,19 @@ class Register extends  Component {
                 <Form onSubmit={this.handleSubmit} className="registerContainer">
                     <Form.Item
                         {...formItemLayout}
-                        label="E-mail"
+                        label="用户名"
+                    >
+                        {getFieldDecorator('name', {
+                            rules: [ {
+                                required: true, message: '请输入用户名!',
+                            }],
+                        })(
+                            <Input placeholder="请输入用户名"/>
+                        )}
+                    </Form.Item>
+                    <Form.Item
+                        {...formItemLayout}
+                        label="注册账号"
                     >
                         {getFieldDecorator('email', {
                             rules: [{
@@ -83,7 +132,7 @@ class Register extends  Component {
                                 required: true, message: '请输入EMAIL地址!',
                             }],
                         })(
-                            <Input />
+                            <Input placeholder="仅支持邮箱注册"/>
                         )}
                     </Form.Item>
                     <Form.Item
@@ -97,7 +146,7 @@ class Register extends  Component {
                                 validator: this.validateToNextPassword,
                             }],
                         })(
-                            <Input type="password" />
+                            <Input type="password" placeholder="请输入密码"/>
                         )}
                     </Form.Item>
                     <Form.Item
@@ -111,9 +160,18 @@ class Register extends  Component {
                                 validator: this.compareToFirstPassword,
                             }],
                         })(
-                            <Input type="password" onBlur={this.handleConfirmBlur} />
+                            <Input type="password" onBlur={this.handleConfirmBlur} placeholder="请再次输入密码"/>
                         )}
                     </Form.Item>
+                    <Form.Item
+                        {...tailFormItemLayout}
+                    >
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                            注册
+                        </Button>
+                        &nbsp;&nbsp; Or <Link to='/login'><span style={{fontSize:15}}>登录</span></Link>
+                    </Form.Item>
+
                 </Form>
             </div>
         )
