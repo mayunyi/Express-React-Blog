@@ -10,7 +10,8 @@ import highlight from 'highlight.js';
 import 'simplemde/dist/simplemde.min.css';
 import {getUser} from '../../auth';
 import Cropper from 'react-cropper';
-import '../../../node_modules/react-cropper/node_modules/cropperjs/dist/cropper.css'
+import 'cropperjs/dist/cropper.css';
+// import '../../../node_modules/react-cropper/node_modules/cropperjs/dist/cropper.css'
 const Option = Select.Option;
 const FormItem = Form.Item;
 
@@ -92,26 +93,27 @@ class SendArticle extends Component{
                 this.setState({
                     loading:true
                 });
-                console.log('Received values of form: ', values);
                 let postDat = {
-                    articleTitle:values.titleValue,
-                    articleWriter:values.articleWriter,
-                    articleContent:value,
-                    markIds:values.markIds,
-                    articleAbout:values.articleAbout
+                    Title:values.Title,
+                    dec:values.dec,
+                    content:value,
+                    tags:values.tags,
+                    writerId:this.state.user.userId,
+                    writer:values.writer,
+                    img:'http://file.ituring.com.cn/SmallCover/171209db19f1a52dcb95'
                 };
-                debugger
-                fetch('/blog/iarticle',{
+                fetch('api/articlelist/add',{
                     method:"POST",
                     mode: "cors",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization":getUser().token
                     },
                     body: JSON.stringify(postDat),
                 }).then(rep=>{
                     return rep.json();
                 }).then(json=>{
-                    if(JSON.stringify(json.res) != '{}'){
+                    if(JSON.stringify(json) != '{}'){
                         this.smde.value('');
                         this.props.form.resetFields();
                         this.setState({
