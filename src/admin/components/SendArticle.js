@@ -14,7 +14,6 @@ import '../../../node_modules/react-cropper/node_modules/cropperjs/dist/cropper.
 const Option = Select.Option;
 const FormItem = Form.Item;
 
-
 class SendArticle extends Component{
      constructor(props,context){
         super(props,context);
@@ -63,12 +62,22 @@ class SendArticle extends Component{
 
     //获取所有的标签
     getAllTags(){
-        fetch(`blog/mark/all`).then(rep=>{
+        fetch(
+            `api/tags/find?userId=${getUser().userId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":getUser().token
+                },
+            }
+        ).then(rep=>{
             return rep.json();
         }).then(json=>{
-            this.setState({
-                allTags:json
-            })
+            if(json.status === 2){
+                this.setState({
+                    allTags:json.data
+                })
+            }
         })
     }
 
@@ -144,7 +153,7 @@ class SendArticle extends Component{
                                 {...formItemLayout}
                                 label="标题"
                             >
-                                {getFieldDecorator('titleValue', {
+                                {getFieldDecorator('Title', {
                                     rules: [{
                                         required: true, message: '标题必填!',
                                     }],
@@ -160,7 +169,7 @@ class SendArticle extends Component{
                                 {...formItemLayout1}
                                 label="标签"
                             >
-                                {getFieldDecorator('markIds', {
+                                {getFieldDecorator('tags', {
                                     rules: [{
                                         required: true, message: '标签必选!',
                                     }],
@@ -171,7 +180,7 @@ class SendArticle extends Component{
                                     >
                                         {
                                             this.state.allTags.map(item=>{
-                                                return <Option key={item.markId} value = {item.markId}>{item.markName}</Option>
+                                                return <Option key={item._id} value = {item._id}>{item.tag}</Option>
                                             })
                                         }
                                     </Select>
@@ -183,13 +192,34 @@ class SendArticle extends Component{
                                 {...formItemLayout1}
                                 label="作者"
                             >
-                                {getFieldDecorator('articleWriter', {
+                                {getFieldDecorator('writer', {
                                     initialValue: this.state.user.userName,
                                     rules: [{
                                         required: true, message: '  缺少作者!',
                                     }],
                                 })(
                                     <Input placeholder="请输入作者" disabled={true}/>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={8}>
+                            <FormItem
+                                {...formItemLayout1}
+                                label="封面照"
+                            >
+                                {getFieldDecorator('img')(
+                                    <Upload
+                                        listType="picture-card"
+                                        showUploadList={false}
+                                        beforeUpload={this.beforeUpload}
+                                    >
+                                        <div>
+                                            <Icon type="plus" />
+                                            <div className="ant-upload-text">上传图片</div>
+                                        </div>
+                                    </Upload>
                                 )}
                             </FormItem>
                         </Col>
@@ -219,7 +249,7 @@ class SendArticle extends Component{
                                 {...formItemLayout}
                                 label="文章描述"
                             >
-                                {getFieldDecorator('articleAbout', {
+                                {getFieldDecorator('dec', {
                                     rules: [{
                                         required: true, message: '请输入文章描述!',
                                     }],
@@ -231,7 +261,8 @@ class SendArticle extends Component{
                     </Row>
                     <Row>
                         <Col>
-                            <textarea id={this.editorId}/>
+                            {/*<textarea id={this.editorId}/>*/}
+                            <Input.TextArea  id={this.editorId} placeholder="请输入文章"/>
                         </Col>
                     </Row>
                     <Row>
