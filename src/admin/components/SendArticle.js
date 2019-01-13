@@ -102,7 +102,7 @@ class SendArticle extends Component{
                     writer:values.writer,
                     img:'http://file.ituring.com.cn/SmallCover/171209db19f1a52dcb95'
                 };
-                fetch('api/articlelist/add',{
+                fetch('/api/articlelist/add',{
                     method:"POST",
                     mode: "cors",
                     headers: {

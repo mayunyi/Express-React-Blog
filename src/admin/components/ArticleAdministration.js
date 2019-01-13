@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import {Table,Pagination,Divider,message} from 'antd'
 import 'simplemde/dist/simplemde.min.css'
 import {getUser} from '../../auth';
-import ModifyArticles from './ModifyArticles'
+import ModifyArticles from './ModifyArticles';
 
 const Fragment = React.Fragment;
 
@@ -16,6 +16,7 @@ export default class ArticleAdministration extends Component{
             data :[],
             total:0,
             page:1,
+            rows:20,
             artliceId:'',
             visible: false,
             artliceData:{},
@@ -32,7 +33,19 @@ export default class ArticleAdministration extends Component{
             title: '标题',
             dataIndex: 'title',
             key: 'title',
+        },  {
+            title: '点赞数量',
+            dataIndex: 'upnum',
+            key: 'upnum',
         }, {
+            title: '留言数量',
+            dataIndex: 'messnum',
+            key: 'messnum',
+        }, {
+            title: '关注数量',
+            dataIndex: 'likenum',
+            key: 'likenum',
+        },{
             title: '创建时间',
             dataIndex: 'creatTime',
             key: 'creatTime',
@@ -50,7 +63,7 @@ export default class ArticleAdministration extends Component{
     }
     componentDidMount() {
         //获取当前页数所有文章
-        this.getAllArticle(this.state.page);
+        this.getAllArticle(this.state.page,this.state.rows);
 
     }
     //编辑方法
@@ -63,42 +76,53 @@ export default class ArticleAdministration extends Component{
 
     //删除文章
     artliceDelete(value){
-        fetch(`/blog/iarticle/${value.id}`,{
+        const { user } = this.state;
+        fetch(`/api/articlelist/delete/${value.id}`,{
             method:"DELETE",
             mode: "cors",
-            //credentials: 'include',
+            headers: {
+                "Authorization":user.token
+            },
         }).then(rep=>{
             return rep.json();
         }).then(json=>{
-            if(json.res === 1){
-                this.getAllArticle(this.state.page);
+            try{
+                this.getAllArticle(this.state.page,this.state.rows);
                 return message.success('操作成功')
-            } else {
+            } catch(e){
                 return message.error('操作失败')
             }
         })
     }
 
-    getAllArticle(value){
-        fetch(`/blog/page/article/all/${value}`).then(rep=>{
+    getAllArticle(page,rows){
+        const { user } = this.state;
+        fetch(`/api/articlelist/user?page=${page}&rows=${rows}&userid=${user.userId}`,{
+            headers: {
+                "Authorization":user.token
+            },
+        }).then(rep=>{
             return rep.json();
         }).then(json=>{
-            let articleData = json.res.rows;
+            let articleData = json.data;
             articleData.sort((a,b)=>{
-                return  Date.parse(b.createdAt) - Date.parse(a.createdAt)
+                return  Date.parse(b.date) - Date.parse(a.date)
             });
             let tableData = [];
             articleData.map((s,index)=>{
                 tableData.push({
                     NO:index+1,
-                    id:s.articleId,
-                    title:s.articleTitle,
-                    creatTime:s.createdAt?s.createdAt.substring(0,s.createdAt.indexOf('T')):''
+                    id:s._id,
+                    title:s.Title,
+                    messnum:s.messnum,
+                    likenum:s.likenum,
+                    upnum:s.upnum,
+                    creatTime:s.date?s.date.substring(0,s.date.indexOf('T')):''
                 })
             });
             this.setState({
                 data:tableData,
-                total:json.res.count
+                total:json.toatl
             })
         })
     }
@@ -112,7 +136,7 @@ export default class ArticleAdministration extends Component{
         this.setState({
             isEdit:false
         });
-        this.getAllArticle(this.state.page)
+        this.getAllArticle(this.state.page,this.state.rows)
     };
     render () {
         return (
