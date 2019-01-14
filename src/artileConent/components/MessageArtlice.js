@@ -12,13 +12,13 @@ export default class MessageArtlice extends Component {
         super(props,context);
         this.state = {
             messageData:[],
-            messagePage:0,
-            messageToatl:0,
+            messagePage:0,         //接口的当前页
+            messageToatl:0,     //留言的总数量
             page:1,
             pageCount:10,
             reply:'',       //判断是否回复 根基messageId
             messageConent:'',   //回复内容
-            arlitceConent:''
+            arlitceConent:'',
         }
     }
 
@@ -47,7 +47,6 @@ export default class MessageArtlice extends Component {
 
     render() {
         const { messageData } = this.state;
-        console.log(this.props)
         return(
             <Fragment>
                 <div className="messageLayout">
@@ -56,7 +55,7 @@ export default class MessageArtlice extends Component {
                         {
                             messageData.map(s=>{
                                 return (
-                                    <li key={s.id}>
+                                    <li key={s._id}>
                                         <div className="Item">
                                             <Avatar shape="square" src={s.Avatar}/>
                                             <p className="messageUser">{s.messageuser}</p>
@@ -65,19 +64,19 @@ export default class MessageArtlice extends Component {
                                         <div className="messageConnect">
                                             {s.content}
                                             <div style={{marginTop:10}}>
-                                                <span style={{ marginRight: 20,cursor:'pointer'}} onClick={this._ChangeParentLike.bind(this,s.id)}>
+                                                <span style={{ marginRight: 20,cursor:'pointer'}} onClick={this._ChangeParentLike.bind(this,s._id)}>
                                                     <Icon type='like-o' style={{ marginRight: 8 }} />{s.like_num}
                                                 </span>
-                                                <span style={{ marginRight: 20 ,cursor:'pointer'}} onClick={this._ChangeMessage.bind(this,s.id)}>
+                                                <span style={{ marginRight: 20 ,cursor:'pointer'}} onClick={this._ChangeMessage.bind(this,s._id)}>
                                                     <Icon type='message' style={{ marginRight: 8 }} />
                                                     {
-                                                        this.state.reply !== s.id ? '回复' : '取消回复'
+                                                        this.state.reply !== s._id ? '回复' : '取消回复'
                                                     }
                                                 </span>
                                                 {
-                                                    this.state.reply == s.id  && <div>
+                                                    this.state.reply == s._id  && <div>
                                                         <Input placeholder={`回复${s.messageuser}`} style={{width:'60%'}} onChange = {this.InputText} value = {this.state.messageConent}/>
-                                                        <Button style={{marginLeft:10}} type="primary" onClick={this._BottonReply.bind(this,s,s.id)}>发布</Button>
+                                                        <Button style={{marginLeft:10}} type="primary" onClick={this._BottonReply.bind(this,s,s._id)}>发布</Button>
                                                     </div>
                                                 }
                                             </div>
@@ -106,7 +105,7 @@ export default class MessageArtlice extends Component {
                                                                     {
                                                                         this.state.reply == c._id && <div>
                                                                             <Input placeholder={`回复${c.messageuser}`} style={{width:'60%'}} value = {this.state.messageConent} onChange = {this.InputText}/>
-                                                                            <Button style={{marginLeft:10}} type="primary" onClick={this._BottonReply.bind(this,c,s.id)}>发布</Button>
+                                                                            <Button style={{marginLeft:10}} type="primary" onClick={this._BottonReply.bind(this,c,s._id)}>发布</Button>
                                                                         </div>
                                                                     }
                                                                 </div>
@@ -122,7 +121,7 @@ export default class MessageArtlice extends Component {
                         }
                     </ul>
                     <div style={{padding:10}}>
-                        <Pagination current={this.state.messagePage} total={this.state.messageToatl} />
+                        <Pagination current={this.state.messagePage} total={this.state.messageToatl} onChange = {this.PaginationChange.bind(this)}/>
                     </div>
                     <div style={{padding:10}}>
                         <Avatar size="large" icon="user" />
@@ -133,6 +132,17 @@ export default class MessageArtlice extends Component {
             </Fragment>
         );
     }
+
+    // 分页查询方法
+    PaginationChange(page, pageSize){
+        let local = this.props.match.params.id;
+        this.getMessage(local,page, pageSize)
+        this.setState({
+            page:page,
+            pageCount:pageSize
+        })
+    }
+
     _BottonArtlice =() =>{
         if(!getUser().userId){
             return message.warning('登录后在评论！')
