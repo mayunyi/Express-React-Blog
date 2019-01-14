@@ -22,7 +22,7 @@ const FunListArtlice = (props) =>{
             likenum:props.articleList[i].likenum,
             messnum:props.articleList[i].messnum,
             upnum:props.articleList[i].upnum,
-            tags:props.articleList[i].tags,
+            tags:props.articleList[i].extra_params.tagsData,
             writer:props.articleList[i].writer,
             writerId:props.articleList[i].writerId,
             date:props.articleList[i].date,
@@ -76,7 +76,7 @@ const FunListArtlice = (props) =>{
                                     }
                                     {
                                         item.tags.map((s,index)=>{
-                                            return <Tag color="magenta" key = {index}>{s}</Tag>
+                                            return <Tag color="magenta" key = {index}>{s.name}</Tag>
                                         })
                                     }
                                 </div>

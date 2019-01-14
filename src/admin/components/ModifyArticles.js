@@ -389,6 +389,7 @@ class ModifyArticles extends Component{
     };
     handleSubmit = (e) =>{
         e.preventDefault();
+        const { allTags } = this.state;
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let value = this.smde.value();
@@ -398,19 +399,28 @@ class ModifyArticles extends Component{
                 this.setState({
                     loading:true
                 });
-                // let postDat = {
-                //     articleTitle:values.titleValue,
-                //     articleWriter:values.articleWriter,
-                //     articleContent:value,
-                // };
+                let tagsArr = [];
+                values.tags.map(s=>{
+                    allTags.map(item=>{
+                        if(s === item._id){
+                            tagsArr.push({
+                                id:s,
+                                name:item.tag
+                            })
+                        }
+                    })
+                });
                 let postDat = {
                     Title:values.Title,
                     dec:values.dec,
                     content:value,
                     tags:values.tags,
-                    img:this.state.imgList.length==0?"":this.state.imgList[0].url
+                    img:this.state.imgList.length==0?"":this.state.imgList[0].url,
+                    extra_params:{
+                        tagsData:tagsArr
+                    }
                 };
-                debugger
+
                 fetch(`/api/articlelist/edit/${this.props.artliceId}`,{
                     method:"POST",
                     mode: "cors",

@@ -84,6 +84,7 @@ class SendArticle extends Component{
 
     handleSubmit = (e) =>{
         e.preventDefault();
+        const { allTags } = this.state;
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let value = this.smde.value();
@@ -93,6 +94,17 @@ class SendArticle extends Component{
                 this.setState({
                     loading:true
                 });
+                let tagsArr = [];
+                values.tags.map(s=>{
+                    allTags.map(item=>{
+                        if(s === item._id){
+                            tagsArr.push({
+                                id:s,
+                                name:item.tag
+                            })
+                        }
+                    })
+                });
                 let postDat = {
                     Title:values.Title,
                     dec:values.dec,
@@ -100,7 +112,10 @@ class SendArticle extends Component{
                     tags:values.tags,
                     writerId:this.state.user.userId,
                     writer:values.writer,
-                    img:'http://file.ituring.com.cn/SmallCover/171209db19f1a52dcb95'
+                    img:'http://file.ituring.com.cn/SmallCover/171209db19f1a52dcb95',
+                    extra_params:{
+                        tagsData:tagsArr
+                    }
                 };
                 fetch('/api/articlelist/add',{
                     method:"POST",
