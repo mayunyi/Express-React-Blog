@@ -21,29 +21,44 @@ class ModifyArticles extends Component{
         this.state ={
             user:getUser(),
             loading:false,
-
             srcCropper:'',
             selectImgName:'',
             selectImgSize:0,
             selectImgSuffix:'',
             editImageModalVisible:false,
             imgData:'',
-
-            editArtliceData:{}
+            allTags:[],
+            editArtliceData:{},
+            imgList:[]              //封面照显示
         };
         this.editorId = 'editor';
         this.smde = null;
     }
 
     componentDidMount() {
-        fetch(`/blog/article/${this.props.artliceId}` ).then(rep=>{
+        this.getAllTags();
+        fetch(`/api/articlelist/${this.props.artliceId}` ).then(rep=>{
             return rep.json();
         }).then(json=> {
             let artliceData = {
-                articleTitle: json.res.articleTitle,
-                articleWriter: json.res.articleWriter,
-                articleContent: json.res.articleContent
+                articleTitle: json.Title,
+                articleWriter: json.writer,
+                articleContent: json.content,
+                dec:json.dec,
+                tags:json.tags,
+                img:json.img,
+                previewImage:'',
+                previewImgVisible: false,
             };
+            let imgList = [];
+            if(json.img){
+                imgList.push({
+                    uid: '-1',
+                    name: '封面图片.png',
+                    status: 'done',
+                    url: json.img
+                })
+            }
             //加载markdown的插件
             this.smde = new SimpleMDE({
                 element: document.getElementById(this.editorId).childElementCount,
@@ -67,15 +82,48 @@ class ModifyArticles extends Component{
             });
             this.smde.value(artliceData.articleContent);
             this.setState({
-                editArtliceData: artliceData
+                editArtliceData: artliceData,
+                imgList:imgList
             })
         })
     };
+    //获取所有的标签
+    getAllTags(){
+        fetch(
+            `/api/tags/find?userId=${getUser().userId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":getUser().token
+                },
+            }
+        ).then(rep=>{
+            return rep.json();
+        }).then(json=>{
+            if(json.status === 2){
+                this.setState({
+                    allTags:json.data
+                })
+            }
+        })
+    }
+
+    handleImgCancel = () => this.setState({ previewImgVisible: false });
+
+    handlePreview = (file) => {
+        this.setState({
+            previewImage: file.url || file.thumbUrl,
+            previewImgVisible: true,
+        });
+    };
+    onRemoveImg = (file) =>this.setState({ previewImage: '',imgList:[] });
+
+    handleChange = ({ fileList }) => this.setState({ fileList });
 
     render() {
         let self = this;
         const { getFieldDecorator } = self.props.form;
-
+        const { previewImgVisible, previewImage, imgList } = this.state;
         const formItemLayout = {
             labelCol: {span: 2},
             wrapperCol: {span: 22}
@@ -93,7 +141,7 @@ class ModifyArticles extends Component{
                                 {...formItemLayout}
                                 label="标题"
                             >
-                                {getFieldDecorator('titleValue', {
+                                {getFieldDecorator('Title', {
                                     initialValue:this.state.editArtliceData.articleTitle,
                                     rules: [{
                                         required: true, message: '标题必填!',
@@ -102,16 +150,39 @@ class ModifyArticles extends Component{
                                     <Input placeholder="请输入标题"/>
                                 )}
                             </FormItem>
-
                         </Col>
                     </Row>
                     <Row>
                         <Col span={8}>
                             <FormItem
                                 {...formItemLayout1}
+                                label="标签"
+                            >
+                                {getFieldDecorator('tags', {
+                                    initialValue: this.state.editArtliceData.tags,
+                                    rules: [{
+                                        required: true, message: '标签必选!',
+                                    }],
+                                })(
+                                    <Select
+                                        mode="multiple"
+                                        placeholder='请选择标签'
+                                    >
+                                        {
+                                            this.state.allTags.map(item=>{
+                                                return <Option key={item._id} value = {item._id}>{item.tag}</Option>
+                                            })
+                                        }
+                                    </Select>
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                {...formItemLayout1}
                                 label="作者"
                             >
-                                {getFieldDecorator('articleWriter', {
+                                {getFieldDecorator('writer', {
                                     initialValue: this.state.editArtliceData.articleWriter,
                                     rules: [{
                                         required: true, message: '  缺少作者!',
@@ -121,29 +192,76 @@ class ModifyArticles extends Component{
                                 )}
                             </FormItem>
                         </Col>
+                    </Row>
+                    <Row>
+                        <Col span={8}>
+                            <FormItem
+                                {...formItemLayout1}
+                                label="封面照"
+                            >
+                                <Upload
+                                    listType="picture-card"
+                                    // showUploadList={false}
+                                    // beforeUpload={this.beforeUpload}
+                                    onPreview={this.handlePreview}
+                                    onRemove = {this.onRemoveImg}
+                                    fileList={imgList}
+                                    onChange={this.handleChange}
+                                >
+
+                                        {
+                                            this.state.imgList.length ==1  ? null
+                                                :
+                                                <div>
+                                                    <Icon type="plus" />
+                                                    <div className="ant-upload-text">上传图片</div>
+                                                </div>
+                                        }
+                                </Upload>
+                                <Modal visible={previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
+                                    <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                </Modal>
+                            </FormItem>
+                        </Col>
                         <Col span={8}>
                             <FormItem
                                 {...formItemLayout1}
                                 label="附件"
                             >
-                                {getFieldDecorator('imgList')(
-                                    <Upload
-                                        listType="picture-card"
-                                        showUploadList={false}
-                                        beforeUpload={this.beforeUpload}
-                                    >
-                                        <div>
-                                            <Icon type="plus" />
-                                            <div className="ant-upload-text">上传图片</div>
-                                        </div>
-                                    </Upload>
+                                <Upload
+                                    listType="picture-card"
+                                    showUploadList={false}
+                                    beforeUpload={this.beforeUpload}
+                                >
+                                    <div>
+                                        <Icon type="plus" />
+                                        <div className="ant-upload-text">上传图片</div>
+                                    </div>
+                                </Upload>
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={24}>
+                            <FormItem
+                                {...formItemLayout}
+                                label="文章描述"
+                            >
+                                {getFieldDecorator('dec', {
+                                    initialValue: this.state.editArtliceData.dec,
+                                    rules: [{
+                                        required: true, message: '请输入文章描述!',
+                                    }],
+                                })(
+                                    <Input placeholder="请输入文章描述"/>
                                 )}
                             </FormItem>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
-                            <textarea id={this.editorId}/>
+                            <Input.TextArea  id={this.editorId} placeholder="请输入文章"/>
+                            {/*<textarea id={this.editorId}/>*/}
                         </Col>
                     </Row>
                     <Row>
@@ -280,22 +398,31 @@ class ModifyArticles extends Component{
                 this.setState({
                     loading:true
                 });
+                // let postDat = {
+                //     articleTitle:values.titleValue,
+                //     articleWriter:values.articleWriter,
+                //     articleContent:value,
+                // };
                 let postDat = {
-                    articleTitle:values.titleValue,
-                    articleWriter:values.articleWriter,
-                    articleContent:value,
+                    Title:values.Title,
+                    dec:values.dec,
+                    content:value,
+                    tags:values.tags,
+                    img:this.state.imgList.length==0?"":this.state.imgList[0].url
                 };
-                fetch(`/blog/iarticle/${this.props.artliceId}`,{
-                    method:"PUT",
+                debugger
+                fetch(`/api/articlelist/edit/${this.props.artliceId}`,{
+                    method:"POST",
                     mode: "cors",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization":getUser().token
                     },
                     body: JSON.stringify(postDat),
                 }).then(rep=>{
                     return rep.json();
                 }).then(json=>{
-                    if(JSON.stringify(json.res) != '{}'){
+                    if(json.status==2){
                         this.smde.value('');
                         this.props.form.resetFields();
                         this.setState({

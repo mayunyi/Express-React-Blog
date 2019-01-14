@@ -154,7 +154,7 @@ export default class TagsAdministration extends Component{
         }).then(json=>{
             let allTag = [];
             switch (json.status){
-                case 1:
+                case 1://查询不到
                     this.setState({
                         tagTable:allTag,
                         spinning:false,
@@ -180,7 +180,7 @@ export default class TagsAdministration extends Component{
                         rows:rows,
                     });
                     break;
-                case 0:
+                case 0://接口失败
                     this.setState({
                         tagTable:allTag,
                         spinning:false,
