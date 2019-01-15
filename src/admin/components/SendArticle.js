@@ -15,6 +15,8 @@ import 'cropperjs/dist/cropper.css';
 const Option = Select.Option;
 const FormItem = Form.Item;
 
+const fileShowUrl = 'http://localhost:5000/api/upload/img';
+
 class SendArticle extends Component{
      constructor(props,context){
         super(props,context);
@@ -31,6 +33,10 @@ class SendArticle extends Component{
             editImageModalVisible:false,
 
             imgData:'',
+            previewImageFMpic:'',        //封面照片预览
+            previewImgVisibleFMpic:false, //封面照片是否预览
+            FMZpic:[],
+            fmzurl:''       //封面照返回的路径
         };
         this.editorId = 'editor';
         this.smde = null;
@@ -112,7 +118,7 @@ class SendArticle extends Component{
                     tags:values.tags,
                     writerId:this.state.user.userId,
                     writer:values.writer,
-                    img:'http://file.ituring.com.cn/SmallCover/171209db19f1a52dcb95',
+                    img:this.state.fmzurl,
                     extra_params:{
                         tagsData:tagsArr
                     }
@@ -132,7 +138,9 @@ class SendArticle extends Component{
                         this.smde.value('');
                         this.props.form.resetFields();
                         this.setState({
-                            loading:false
+                            loading:false,
+                            FMZpic:[],
+                            fmzurl:''
                         });
                         return message.success('新增文章成功')
                     } else {
@@ -146,11 +154,66 @@ class SendArticle extends Component{
         });
     };
 
+    /***封面照上传 start*****/
+    beforeUploadFMpic = (file) => {
+        const isLt10M = file.size / 1024 / 1024 < 10;
+        if (!isLt10M) { //添加文件限制
+            message.error('文件大小不能超过10M');
+            return false;
+        }
+        if(file.type.indexOf('image') === -1){
+            message.error('只能上传照片附件');
+            return false;
+        }
+        // 不适用裁剪功能
+        // let reader=new FileReader();
+        // reader.readAsDataURL(file); //开始读取文件
+        // // 因为读取文件需要时间,所以要在回调函数中使用读取的结果
+        // reader.onload = (e) => {
+        //     this.setState({
+        //         srcCropper: e.target.result, //cropper的图片路径
+        //         selectImgName: file.name, //文件名称
+        //         selectImgSize: (file.size / 1024 / 1024), //文件大小
+        //         selectImgSuffix: file.type.split("/")[1], //文件类型
+        //         editImageModalVisible: true, //打开控制裁剪弹窗的变量，为true即弹窗
+        //     })
+        // };
+        // return false;
+    };
+    uploadProps = {
+        action: fileShowUrl,
+        beforeUpload:this.beforeUploadFMpic,
+        onChange:(values) => {
+            const {file} = values;
+            if (file.status === 'done') {
+                this.setState({
+                    fmzurl:fileShowUrl+'/'+file.response.filePath
+                })
+            }
+            this.setState({ FMZpic: [file] });
+
+        },
+        listType : "picture-card",
+    };
+    handlePreview = (file) => {
+        this.setState({
+            previewImageFMpic: file.url || file.thumbUrl,
+            previewImgVisibleFMpic: true,
+        });
+    };
+    handleImgCancelFMpic = () => this.setState({ previewImgVisibleFMpic: false });
+    handleRemoveFMpic = (file) =>{
+        this.setState({
+            FMZpic:[],
+            fmzurl:''
+        })
+    };
+    /***封面照 end*****/
 
     render() {
         let self = this;
         const { getFieldDecorator } = self.props.form;
-
+        const { previewImgVisibleFMpic, previewImageFMpic, FMZpic } = this.state;
         const formItemLayout = {
             labelCol: {span: 2},
             wrapperCol: {span: 22}
@@ -159,8 +222,12 @@ class SendArticle extends Component{
             labelCol: {span: 4},
             wrapperCol: {span: 20}
         };
-
-
+        const uploadButton = (
+            <div>
+                <Icon type='plus' />
+                <div className="ant-upload-text">上传图片</div>
+            </div>
+        );
         return (
             <Spin tip="发表中..." spinning={this.state.loading}>
                 <Form onSubmit={this.handleSubmit}>
@@ -226,18 +293,17 @@ class SendArticle extends Component{
                                 {...formItemLayout1}
                                 label="封面照"
                             >
-                                {getFieldDecorator('img')(
-                                    <Upload
-                                        listType="picture-card"
-                                        showUploadList={false}
-                                        beforeUpload={this.beforeUpload}
-                                    >
-                                        <div>
-                                            <Icon type="plus" />
-                                            <div className="ant-upload-text">上传图片</div>
-                                        </div>
-                                    </Upload>
-                                )}
+                                <Upload
+                                    {...this.uploadProps}
+                                    onPreview = {this.handlePreview}
+                                    fileList={FMZpic}
+                                    onRemove  = {this.handleRemoveFMpic}
+                                >
+                                    {FMZpic.length>0 ? null : uploadButton}
+                                </Upload>
+                                <Modal visible={previewImgVisibleFMpic} footer={null} onCancel={this.handleImgCancelFMpic}>
+                                    <img alt="example" style={{ width: '100%' }} src={previewImageFMpic} />
+                                </Modal>
                             </FormItem>
                         </Col>
                         <Col span={8}>
@@ -245,18 +311,16 @@ class SendArticle extends Component{
                                 {...formItemLayout1}
                                 label="附件"
                             >
-                                {getFieldDecorator('imgList')(
-                                    <Upload
-                                        listType="picture-card"
-                                        showUploadList={false}
-                                        beforeUpload={this.beforeUpload}
-                                    >
-                                        <div>
-                                            <Icon type="plus" />
-                                            <div className="ant-upload-text">上传图片</div>
-                                        </div>
-                                    </Upload>
-                                )}
+                                <Upload
+                                    listType="picture-card"
+                                    showUploadList={false}
+                                    beforeUpload={this.beforeUpload}
+                                >
+                                    <div>
+                                        <Icon type="plus" />
+                                        <div className="ant-upload-text">上传图片</div>
+                                    </div>
+                                </Upload>
                             </FormItem>
                         </Col>
                     </Row>
@@ -322,16 +386,14 @@ class SendArticle extends Component{
     }
     _crop(){
         let imgData = this.refs.cropper.getCroppedCanvas().toDataURL();
-
         const croppedCanvas = this.refs.cropper.getCroppedCanvas({
             minWidth: 200,
             minHeight: 200,
-            width: 200,
-            height: 200,
-            maxWidth: 200,
-            maxHeight: 200
+            // width: 200,
+            // height: 200,
+            // maxWidth: 200,
+            // maxHeight: 200
         });
-
         croppedCanvas.toBlob(async blob => {
             // 图片name添加到blob对象里
             blob.name = this.state.selectImgName;
@@ -350,17 +412,17 @@ class SendArticle extends Component{
         })
     };
     ImgSave = () => {
-        fetch('/blog/upload/img',{
+        fetch('/api/upload/img',{
             method: 'POST',
             body:this.state.imgData
         }).then(rep=>{
             return rep.json()
         }).then(json=>{
-            if(json.res.msg){
+            if(json.status === 2){
                 //上传的图片设在在smde中显示
                 //下面2种都可以设置
                 // self.smde.value("![](/uploads/"+1+")");
-                this.smde.codemirror.replaceSelection(`![${this.state.selectImgName}](http://db.mayunyi.top/blog/static${json.res.src[0]})`);
+                this.smde.codemirror.replaceSelection(`![${this.state.selectImgName}](${fileShowUrl}/${json.filePath})`);
                 this.setState({
                     editImageModalVisible:false,
                 })
