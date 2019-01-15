@@ -59,7 +59,8 @@ const FunListArtlice = (props) =>{
                         }
                         extra={
                             <img
-                                width={200}
+                                width={100}
+                                height={150}
                                 alt="logo"
                                 src={item.fengImg}
                             />
@@ -82,9 +83,9 @@ const FunListArtlice = (props) =>{
                                 </div>
 
                             }
-                            description={item.description}
+                            //description={item.description}
                         />
-                        {item.content}
+                        {item.description}
                     </List.Item>
                 )}
             />

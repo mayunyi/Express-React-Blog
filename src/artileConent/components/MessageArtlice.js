@@ -32,6 +32,12 @@ export default class MessageArtlice extends Component {
         }
     }
 
+    componentWillUnmount(){
+        //组件卸载调用
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
     //获取该文章留言信息
     getMessage(articleID,page,rows){
         fetch(`/api/message/articlemessage?articleId=${articleID}&page=${page}&rows=${rows}`).then(rep=>{
