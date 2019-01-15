@@ -21,7 +21,7 @@ export const getList = (page = 1,rows = 20) =>{
             const data ={
                 articleList:json.data,
                 page:page,
-                toatl:json.toatl
+                toatl:json.toatl?json.toatl:0
             };
             dispatch(getArtliceList( data ))
         }).catch((e)=>{

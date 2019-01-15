@@ -55,6 +55,7 @@ export default class HeaderComponent extends  Component {
                 </Menu.Item>
             </Menu>
         );
+        console.log(getUser(),this.props.login)
         return (
             <div className="header-link">
                 <li>
