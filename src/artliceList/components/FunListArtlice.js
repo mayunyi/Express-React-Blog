@@ -59,7 +59,7 @@ const FunListArtlice = (props) =>{
                         }
                         extra={
                             <img
-                                width={100}
+                                width={150}
                                 height={150}
                                 alt="logo"
                                 src={item.fengImg}
