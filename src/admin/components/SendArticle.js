@@ -113,15 +113,17 @@ class SendArticle extends Component{
                 });
                 let postDat = {
                     Title:values.Title,
-                    dec:values.dec,
+                    dec:values.dec || '',
                     content:value,
                     tags:values.tags,
                     writerId:this.state.user.userId,
                     writer:values.writer,
-                    img:this.state.fmzurl,
+                    img:this.state.fmzurl || '',
                     extra_params:{
                         tagsData:tagsArr
-                    }
+                    },
+                    keyword:values.keyword.replace(/，/g,',').split(',') || [],          //将中文逗号转英文逗号在分割
+                    state:1
                 };
                 fetch('/api/articlelist/add',{
                     method:"POST",
@@ -134,7 +136,7 @@ class SendArticle extends Component{
                 }).then(rep=>{
                     return rep.json();
                 }).then(json=>{
-                    if(JSON.stringify(json) != '{}'){
+                    if(json.status === 2){
                         this.smde.value('');
                         this.props.form.resetFields();
                         this.setState({
@@ -153,6 +155,77 @@ class SendArticle extends Component{
             }
         });
     };
+
+    /**
+     * 保存功能
+     * */
+    save(e){
+        e.preventDefault();
+        const { allTags } = this.state;
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                let value = this.smde.value();
+                if(!value){
+                    return message.error('请书写文章！')
+                }
+                this.setState({
+                    loading:true
+                });
+                let tagsArr = [];
+                values.tags.map(s=>{
+                    allTags.map(item=>{
+                        if(s === item._id){
+                            tagsArr.push({
+                                id:s,
+                                name:item.tag
+                            })
+                        }
+                    })
+                });
+                let postDat = {
+                    Title:values.Title,
+                    dec:values.dec || '',
+                    content:value,
+                    tags:values.tags,
+                    writerId:this.state.user.userId,
+                    writer:values.writer,
+                    img:this.state.fmzurl || '',
+                    extra_params:{
+                        tagsData:tagsArr
+                    },
+                    keyword:values.keyword && values.keyword.replace(/，/g,',').split(',') || [],          //将中文逗号转英文逗号在分割
+                    state:2
+                };
+                fetch('/api/articlelist/add',{
+                    method:"POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":getUser().token
+                    },
+                    body: JSON.stringify(postDat),
+                }).then(rep=>{
+                    return rep.json();
+                }).then(json=>{
+                    if(json.status === 2){
+                        this.smde.value('');
+                        this.props.form.resetFields();
+                        this.setState({
+                            loading:false,
+                            FMZpic:[],
+                            fmzurl:''
+                        });
+                        return message.success('保存文章成功')
+                    } else {
+                        this.setState({
+                            loading:false
+                        });
+                        return message.error('保存失败')
+                    }
+                })
+            }
+        })
+    }
 
     /***封面照上传 start*****/
     beforeUploadFMpic = (file) => {
@@ -215,12 +288,16 @@ class SendArticle extends Component{
         const { getFieldDecorator } = self.props.form;
         const { previewImgVisibleFMpic, previewImageFMpic, FMZpic } = this.state;
         const formItemLayout = {
-            labelCol: {span: 2},
-            wrapperCol: {span: 22}
+            labelCol: { span: 2 },
+            wrapperCol: { span: 22 },
         };
         const formItemLayout1 = {
             labelCol: {span: 4},
             wrapperCol: {span: 20}
+        };
+        const keywordLayout = {
+            labelCol: {span: 6},
+            wrapperCol: {span: 18}
         };
         const uploadButton = (
             <div>
@@ -231,8 +308,8 @@ class SendArticle extends Component{
         return (
             <Spin tip="发表中..." spinning={this.state.loading}>
                 <Form onSubmit={this.handleSubmit}>
-                    <Row>
-                        <Col span={16}>
+                    <Row >
+                        <Col span={24}>
                             <FormItem
                                 {...formItemLayout}
                                 label="标题"
@@ -247,8 +324,8 @@ class SendArticle extends Component{
                             </FormItem>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col span={8}>
+                    <Row >
+                        <Col  span={12}>
                             <FormItem
                                 {...formItemLayout1}
                                 label="标签"
@@ -271,7 +348,7 @@ class SendArticle extends Component{
                                 )}
                             </FormItem>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12} >
                             <FormItem
                                 {...formItemLayout1}
                                 label="作者"
@@ -287,11 +364,25 @@ class SendArticle extends Component{
                             </FormItem>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row gutter={16}>
                         <Col span={8}>
                             <FormItem
+                                {...keywordLayout}
+                                label="关键字"
+                            >
+                                {getFieldDecorator('keyword', {
+                                    //rules: [{
+                                     //   required: true, message: '请输入文章关键字',
+                                    //}],
+                                })(
+                                    <Input placeholder="请输入文章关键字,以‘,’号隔开"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={6} offset={2}>
+                            <FormItem
                                 {...formItemLayout1}
-                                label="封面照"
+                                label="封面"
                             >
                                 <Upload
                                     {...this.uploadProps}
@@ -325,7 +416,7 @@ class SendArticle extends Component{
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={24}>
+                        <Col>
                             <FormItem
                                 {...formItemLayout}
                                 label="文章描述"
@@ -346,14 +437,27 @@ class SendArticle extends Component{
                             <Input.TextArea  id={this.editorId} placeholder="请输入文章"/>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row >
                         <Col>
                             <FormItem>
                                 <Button
                                     type="primary"
                                     htmlType="submit"
+                                    style = {{
+                                        float:"right"
+                                    }}
                                 >
                                     发表
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    onClick={this.save.bind(this)}
+                                    style = {{
+                                        float:"right",
+                                        marginRight:20
+                                    }}
+                                >
+                                    保存
                                 </Button>
                             </FormItem>
                         </Col>

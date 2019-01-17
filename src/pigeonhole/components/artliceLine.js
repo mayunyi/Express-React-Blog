@@ -32,7 +32,7 @@ export default class ArtliceLine extends Component {
             return message.warning('请登录！')
         }
         fetch(
-            `/api/articlelist/user?page=${page}&rows=${rows}&userid=${this.user.userId}`,
+            `/api/articlelist/user?page=${page}&rows=${rows}&userid=${this.user.userId}&state=1`,
             {
                 method: "GET",
                 mode: "cors",

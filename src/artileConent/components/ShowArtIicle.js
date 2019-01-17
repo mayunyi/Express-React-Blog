@@ -72,15 +72,23 @@ export default class ShowArticle extends Component {
         fetch(`/api/articlelist/${articleID}`).then(rep=>{
             return rep.json();
         }).then(json=>{
-            this.setState({
-                title:json.Title,
-                writer:json.writer,
-                data:json.date ? json.date.substring(0,json.date.indexOf('T')):'',
-                articleContent:json.content,
-                marks:json.tags,
-                writerId:json.writerId,
-                loading:false
-            })
+            if(json.status === 2){
+                this.setState({
+                    title:json.data.Title,
+                    writer:json.data.writer,
+                    data:json.data.date ? json.data.date.substring(0,json.data.date.indexOf('T')):'',
+                    articleContent:json.data.content,
+                    marks:json.data.tags,
+                    writerId:json.data.writerId,
+                    loading:false
+                })
+            } else {
+                message.error('获取文章失败');
+                this.setState({
+                    loading:false
+                })
+            }
+
         })
     }
 
