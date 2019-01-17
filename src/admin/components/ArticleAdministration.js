@@ -82,8 +82,8 @@ class ArticleAdministration extends Component{
     }
     componentDidMount() {
         //获取当前页数所有文章
-        this.getAllArticle(this.state.page,this.state.rows);
-
+        this.getArticle(this.state.page,this.state.rows,'');
+        this.onUserTags()
     }
     //编辑方法
     artliceEdit(value){
@@ -106,7 +106,7 @@ class ArticleAdministration extends Component{
             return rep.json();
         }).then(json=>{
             try{
-                this.getAllArticle(this.state.page,this.state.rows);
+                this.getArticle(this.state.page,this.state.rows);
                 return message.success('操作成功')
             } catch(e){
                 return message.error('操作失败')
@@ -114,9 +114,15 @@ class ArticleAdministration extends Component{
         })
     }
 
-    getAllArticle(page,rows){
+    /***
+     *  获取文章
+     * @param page 当前页
+     * @param rows  一页多少条
+     * @param params    查询参数
+     */
+    getArticle(page,rows,params){
         const { user } = this.state;
-        fetch(`/api/articlelist/user?page=${page}&rows=${rows}&userid=${user.userId}`,{
+        fetch(`/api/articlelist/user?page=${page}&rows=${rows}&userid=${user.userId}&${params}`,{
             headers: {
                 "Authorization":user.token
             },
@@ -145,6 +151,11 @@ class ArticleAdministration extends Component{
                     data:tableData,
                     total:json.toatl
                 })
+            } else {
+                this.setState({
+                    data:[],
+                    total:0
+                })
             }
         })
     }
@@ -152,20 +163,21 @@ class ArticleAdministration extends Component{
         this.setState({
             page:page
         });
-        this.getAllArticle(page)
+        this.getArticle(page,this.state.rows,'')
     };
+    //返回
     CallBack(){
         this.setState({
             isEdit:false
         });
-        this.getAllArticle(this.state.page,this.state.rows)
+        this.getArticle(this.state.page,this.state.rows,'')
     };
 
 
     //获取用户的所有的标签
     onUserTags(){
         fetch(
-            `api/tags/find?userId=${getUser().userId}`,
+            `/api/tags/find?userId=${getUser().userId}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -182,17 +194,43 @@ class ArticleAdministration extends Component{
             }
         })
     }
+    //用户查询功能
+    onFilter = (e) =>{
+        e.preventDefault();
+        const { user } = this.state;
+        if(!user.userId){
+            message.error('请登录用户！')
+        }
+        this.props.form.validateFields((err, values) => {
+            if(!err){
+                let params = Object.keys(values).map(k => {
+                    if(values[k]){
+                        return `${k}=${values[k]}`;
+                    }
+                }).join('&');
+                let page = 1;
+                let rows = this.state.rows;
+                this.getArticle(page,rows,params)
+            }
+        })
+    };
+
+    /****
+     * 清空 查询值
+     */
+    onClear = () =>{
+        this.props.form.resetFields();
+        let page = 1;
+        let rows = this.state.rows;
+        this.getArticle(page,rows,'')
+    };
     render () {
         let self = this;
         const { getFieldDecorator } = self.props.form;
-
+        const { allTags } = self.state;
         const Layout = {
             labelCol: {span: 8},
             wrapperCol: {span: 16}
-        };
-        const ButtonLayout = {
-            labelCol: {span: 4},
-            wrapperCol: {span: 6}
         };
         return (
             <Fragment>
@@ -210,11 +248,17 @@ class ArticleAdministration extends Component{
                                         >
                                             {
                                                 getFieldDecorator('tag', {
-                                                    onChange: this.onUserTags
+
                                                 })(
                                                     <Select
                                                         placeholder='请选择标签'
-                                                    />
+                                                    >
+                                                        {
+                                                            allTags.map((item,index)=>{
+                                                                return <Option value= {item._id} key = {index}>{item.tag}</Option>
+                                                            })
+                                                        }
+                                                    </Select>
                                                 )
                                             }
                                         </FormItem>
@@ -262,19 +306,10 @@ class ArticleAdministration extends Component{
                                     <Col span={2} >
                                         <Row>
                                             <FormItem>
-                                                <Button >清除</Button>
+                                                <Button onClick={this.onClear}>清除</Button>
                                             </FormItem>
                                         </Row>
                                     </Col>
-                                    {/*<Col span={6}>*/}
-
-                                            {/*<Button type="primary" htmlType="submit" style = {{float:"right"}}>*/}
-                                                {/*查询*/}
-                                            {/*</Button>*/}
-                                            {/*<Button type="primary"  style = {{float:"right", marginRight:20}}>*/}
-                                                {/*清空*/}
-                                            {/*</Button>*/}
-                                    {/*</Col>*/}
                                 </Row>
                             </Form>
                             <Table
@@ -285,7 +320,7 @@ class ArticleAdministration extends Component{
                             />
                             <div style = {{paddingTop:20}}>
                                 {
-                                    this.state.total != 0 && <Pagination onChange={this.onChange} total={this.state.total} defaultPageSize={20} current={this.state.page}/>
+                                    this.state.total != 0 && <Pagination onChange={this.onChange} total={this.state.total} pageSize={this.state.rows} current={this.state.page}/>
                                 }
                             </div>
                         </Fragment>

@@ -90,7 +90,10 @@ class SendArticle extends Component{
 
     handleSubmit = (e) =>{
         e.preventDefault();
-        const { allTags } = this.state;
+        const { allTags,user } = this.state;
+        if(!user.userId){
+            message.error('请登录用户！')
+        }
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let value = this.smde.value();
@@ -161,7 +164,10 @@ class SendArticle extends Component{
      * */
     save(e){
         e.preventDefault();
-        const { allTags } = this.state;
+        const { allTags,user } = this.state;
+        if(!user.userId){
+            message.error('请登录用户！')
+        }
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let value = this.smde.value();
