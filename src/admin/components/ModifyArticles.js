@@ -13,7 +13,8 @@ import Cropper from 'react-cropper';
 import '../../../node_modules/react-cropper/node_modules/cropperjs/dist/cropper.css'
 const Option = Select.Option;
 const FormItem = Form.Item;
-
+//显示照片的路径
+const fileShowUrl = 'http://localhost:5000/api/upload/img';
 class ModifyArticles extends Component{
 
     constructor(props,context){
@@ -40,51 +41,55 @@ class ModifyArticles extends Component{
         fetch(`/api/articlelist/${this.props.artliceId}` ).then(rep=>{
             return rep.json();
         }).then(json=> {
-            let artliceData = {
-                articleTitle: json.Title,
-                articleWriter: json.writer,
-                articleContent: json.content,
-                dec:json.dec,
-                tags:json.tags,
-                img:json.img,
-                previewImage:'',
-                previewImgVisible: false,
-            };
-            let imgList = [];
-            if(json.img){
-                imgList.push({
-                    uid: '-1',
-                    name: '封面图片.png',
-                    status: 'done',
-                    url: json.img
+            if(json.status === 2){
+                let artliceData = {
+                    articleTitle: json.data.Title,
+                    articleWriter: json.data.writer,
+                    articleContent: json.data.content,
+                    dec:json.data.dec,
+                    tags:json.data.tags,
+                    img:json.data.img,
+                    state:json.data.state,
+                    keyword:json.data.keyword,
+                    previewImage:'',
+                    previewImgVisible: false,
+                };
+                let imgList = [];
+                if(json.data.img){
+                    imgList.push({
+                        uid: '-1',
+                        name: '封面图片.png',
+                        status: 'done',
+                        url: json.data.img
+                    })
+                }
+                //加载markdown的插件
+                this.smde = new SimpleMDE({
+                    element: document.getElementById(this.editorId).childElementCount,
+                    autofocus: true,
+                    autosave: true,
+                    previewRender: function (plainText) {
+                        return marked(plainText, {
+                            renderer: new marked.Renderer(),
+                            gfm: true,
+                            pedantic: false,
+                            sanitize: false,
+                            tables: true,
+                            breaks: true,
+                            smartLists: true,
+                            smartypants: true,
+                            highlight: function (code) {
+                                return highlight.highlightAuto(code).value;
+                            }
+                        });
+                    },
+                });
+                this.smde.value(artliceData.articleContent);
+                this.setState({
+                    editArtliceData: artliceData,
+                    imgList:imgList
                 })
             }
-            //加载markdown的插件
-            this.smde = new SimpleMDE({
-                element: document.getElementById(this.editorId).childElementCount,
-                autofocus: true,
-                autosave: true,
-                previewRender: function (plainText) {
-                    return marked(plainText, {
-                        renderer: new marked.Renderer(),
-                        gfm: true,
-                        pedantic: false,
-                        sanitize: false,
-                        tables: true,
-                        breaks: true,
-                        smartLists: true,
-                        smartypants: true,
-                        highlight: function (code) {
-                            return highlight.highlightAuto(code).value;
-                        }
-                    });
-                },
-            });
-            this.smde.value(artliceData.articleContent);
-            this.setState({
-                editArtliceData: artliceData,
-                imgList:imgList
-            })
         })
     };
     //获取所有的标签
@@ -108,35 +113,86 @@ class ModifyArticles extends Component{
         })
     }
 
-    handleImgCancel = () => this.setState({ previewImgVisible: false });
+    /**
+     * 保存
+     */
+    save(){
 
+    }
+
+    /**
+     * 封面照 附件相关方法
+     *
+     * handleImgCancel =>   封面弹出图片关闭
+     * beforeUploadFMpic => 附件上传前校验
+     * uploadProps => 上传配置参数
+     * handlePreview => 预览封面照
+     * handleRemoveFMpic => 删除封面照
+     * */
+    handleImgCancel = () => this.setState({ previewImgVisible: false });
+    beforeUploadFMpic = (file) => {
+        const isLt10M = file.size / 1024 / 1024 < 10;
+        if (!isLt10M) { //添加文件限制
+            message.error('文件大小不能超过10M');
+            return false;
+        }
+        if(file.type.indexOf('image') === -1){
+            message.error('只能上传照片附件');
+            return false;
+        }
+    };
+    uploadProps = {
+        action: fileShowUrl,
+        beforeUpload:this.beforeUploadFMpic,
+        onChange:(values) => {
+            const {file} = values;
+            const {editArtliceData} = this.state;
+            if (file.status === 'done') {
+                editArtliceData.img = fileShowUrl+'/'+file.response.filePath;
+                this.setState({
+                    editArtliceData
+                })
+            }
+            this.setState({ imgList: [file] });
+
+        },
+        listType : "picture-card",
+    };
     handlePreview = (file) => {
         this.setState({
             previewImage: file.url || file.thumbUrl,
             previewImgVisible: true,
         });
     };
-    onRemoveImg = (file) =>this.setState({ previewImage: '',imgList:[] });
-
-    handleChange = ({ fileList }) => this.setState({ fileList });
-
+    handleRemoveFMpic = (file) =>this.setState({ previewImage: '',imgList:[] });
+    /********                  END             *********/
     render() {
         let self = this;
         const { getFieldDecorator } = self.props.form;
         const { previewImgVisible, previewImage, imgList } = this.state;
         const formItemLayout = {
-            labelCol: {span: 2},
-            wrapperCol: {span: 22}
+            labelCol: { span: 2 },
+            wrapperCol: { span: 22 },
         };
         const formItemLayout1 = {
             labelCol: {span: 4},
             wrapperCol: {span: 20}
         };
+        const keywordLayout = {
+            labelCol: {span: 6},
+            wrapperCol: {span: 18}
+        };
+        const uploadButton = (
+            <div>
+                <Icon type='plus' />
+                <div className="ant-upload-text">上传图片</div>
+            </div>
+        );
         return (
             <Spin tip="发表中..." spinning={this.state.loading}>
                 <Form onSubmit={this.handleSubmit}>
                     <Row>
-                        <Col span={16}>
+                        <Col span={24}>
                             <FormItem
                                 {...formItemLayout}
                                 label="标题"
@@ -153,7 +209,7 @@ class ModifyArticles extends Component{
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={8}>
+                        <Col span={12}>
                             <FormItem
                                 {...formItemLayout1}
                                 label="标签"
@@ -177,7 +233,7 @@ class ModifyArticles extends Component{
                                 )}
                             </FormItem>
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                             <FormItem
                                 {...formItemLayout1}
                                 label="作者"
@@ -196,27 +252,28 @@ class ModifyArticles extends Component{
                     <Row>
                         <Col span={8}>
                             <FormItem
+                                {...keywordLayout}
+                                label="关键字"
+                            >
+                                {getFieldDecorator('keyword', {
+
+                                })(
+                                    <Input placeholder="请输入文章关键字,以‘,’号隔开"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={6} offset={2}>
+                            <FormItem
                                 {...formItemLayout1}
-                                label="封面照"
+                                label="封面"
                             >
                                 <Upload
-                                    listType="picture-card"
-                                    // showUploadList={false}
-                                    // beforeUpload={this.beforeUpload}
-                                    onPreview={this.handlePreview}
-                                    onRemove = {this.onRemoveImg}
+                                    {...this.uploadProps}
+                                    onPreview = {this.handlePreview}
                                     fileList={imgList}
-                                    onChange={this.handleChange}
+                                    onRemove  = {this.handleRemoveFMpic}
                                 >
-
-                                        {
-                                            this.state.imgList.length ==1  ? null
-                                                :
-                                                <div>
-                                                    <Icon type="plus" />
-                                                    <div className="ant-upload-text">上传图片</div>
-                                                </div>
-                                        }
+                                    {imgList.length>0 ? null : uploadButton}
                                 </Upload>
                                 <Modal visible={previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
                                     <img alt="example" style={{ width: '100%' }} src={previewImage} />
@@ -265,25 +322,30 @@ class ModifyArticles extends Component{
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={22}>
-                            <FormItem>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                >
-                                    发表
-                                </Button>
-                            </FormItem>
-                        </Col>
                         <Col span={2}>
-                            <FormItem>
-                                <Button
-                                    type="primary"
-                                    onClick={this.GoBack}
-                                >
-                                    返回
-                                </Button>
-                            </FormItem>
+                            <Row>
+                                <FormItem>
+                                    <Button type="primary" style = {{float:"left", marginRight:20}}onClick={this.GoBack}>返回</Button>
+                                </FormItem>
+                            </Row>
+                        </Col>
+                        <Col span={20} >
+                            {
+                                this.state.editArtliceData.state == 2 ?
+                                <Row>
+                                    <FormItem>
+                                        <Button type="primary" onClick={this.save.bind(this)} style = {{float:"right"}}>保存</Button>
+                                    </FormItem>
+                                </Row>
+                                    : null
+                            }
+                        </Col>
+                        <Col span={2} >
+                            <Row>
+                                <FormItem>
+                                    <Button type="primary" htmlType="submit" style = {{float:"right" , marginRight:20}}>发表</Button>
+                                </FormItem>
+                            </Row>
                         </Col>
                     </Row>
                 </Form>

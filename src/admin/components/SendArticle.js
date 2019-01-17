@@ -331,7 +331,7 @@ class SendArticle extends Component{
                         </Col>
                     </Row>
                     <Row >
-                        <Col  span={12}>
+                        <Col span={12}>
                             <FormItem
                                 {...formItemLayout1}
                                 label="标签"
@@ -446,25 +446,8 @@ class SendArticle extends Component{
                     <Row >
                         <Col>
                             <FormItem>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    style = {{
-                                        float:"right"
-                                    }}
-                                >
-                                    发表
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    onClick={this.save.bind(this)}
-                                    style = {{
-                                        float:"right",
-                                        marginRight:20
-                                    }}
-                                >
-                                    保存
-                                </Button>
+                                <Button type="primary" htmlType="submit" style = {{float:"right"}}>发表</Button>
+                                <Button type="primary" onClick={this.save.bind(this)} style = {{float:"right", marginRight:20}}>保存</Button>
                             </FormItem>
                         </Col>
                     </Row>
