@@ -30,7 +30,8 @@ class ModifyArticles extends Component{
             imgData:'',
             allTags:[],
             editArtliceData:{},
-            imgList:[]              //封面照显示
+            imgList:[],              //封面照显示
+            keyword:""
         };
         this.editorId = 'editor';
         this.smde = null;
@@ -54,6 +55,14 @@ class ModifyArticles extends Component{
                     previewImage:'',
                     previewImgVisible: false,
                 };
+                let word = '';
+                for(let i=0;i<json.data.keyword.length;i++){
+                    if(i === json.data.keyword.length-1){
+                        word += json.data.keyword[i]
+                    } else {
+                        word += json.data.keyword[i]+','
+                    }
+                }
                 let imgList = [];
                 if(json.data.img){
                     imgList.push({
@@ -87,7 +96,8 @@ class ModifyArticles extends Component{
                 this.smde.value(artliceData.articleContent);
                 this.setState({
                     editArtliceData: artliceData,
-                    imgList:imgList
+                    imgList:imgList,
+                    keyword:word
                 })
             }
         })
@@ -117,7 +127,67 @@ class ModifyArticles extends Component{
      * 保存
      */
     save(){
-
+        const { allTags } = this.state;
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                let value = this.smde.value();
+                if(!value){
+                    return message.error('请书写文章！')
+                }
+                this.setState({
+                    loading:true
+                });
+                let tagsArr = [];
+                values.tags.map(s=>{
+                    allTags.map(item=>{
+                        if(s === item._id){
+                            tagsArr.push({
+                                id:s,
+                                name:item.tag
+                            })
+                        }
+                    })
+                });
+                let postDat = {
+                    Title:values.Title,
+                    dec:values.dec,
+                    content:value,
+                    tags:values.tags,
+                    img:this.state.imgList.length==0?"":this.state.imgList[0].url,
+                    extra_params:{
+                        tagsData:tagsArr
+                    },
+                    keyword:values.keyword && values.keyword.replace(/，/g,',').split(',') || [],          //将中文逗号转英文逗号在分割
+                    state:2
+                };
+                fetch(`/api/articlelist/edit/${this.props.artliceId}`,{
+                    method:"POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":getUser().token
+                    },
+                    body: JSON.stringify(postDat),
+                }).then(rep=>{
+                    return rep.json();
+                }).then(json=>{
+                    if(json.status==2){
+                        this.smde.value('');
+                        this.props.form.resetFields();
+                        this.setState({
+                            loading:false
+                        });
+                        this.props.CallBack();
+                        return message.success('编辑成功!')
+                    } else {
+                        this.setState({
+                            loading:false
+                        });
+                        return message.error('编辑失败')
+                    }
+                })
+            }
+        })
     }
 
     /**
@@ -256,7 +326,7 @@ class ModifyArticles extends Component{
                                 label="关键字"
                             >
                                 {getFieldDecorator('keyword', {
-
+                                    initialValue:this.state.keyword
                                 })(
                                     <Input placeholder="请输入文章关键字,以‘,’号隔开"/>
                                 )}
@@ -383,22 +453,24 @@ class ModifyArticles extends Component{
         const croppedCanvas = this.refs.cropper.getCroppedCanvas({
             minWidth: 200,
             minHeight: 200,
-            width: 200,
-            height: 200,
-            maxWidth: 200,
-            maxHeight: 200
+            // width: 200,
+            // height: 200,
+            // maxWidth: 200,
+            // maxHeight: 200
         });
 
         croppedCanvas.toBlob(async blob => {
-            // 图片name添加到blob对象里
-            blob.name = this.state.selectImgName;
-            // 创建提交表单数据对象
-            const filedata = new FormData();
-            // 添加要上传的文件
-            filedata.append('file', blob, blob.name);
-            this.setState({
-                imgData:filedata
-            });
+            if(blob){
+                // 图片name添加到blob对象里
+                blob.name = this.state.selectImgName;
+                // 创建提交表单数据对象
+                const filedata = new FormData();
+                // 添加要上传的文件
+                filedata.append('file', blob, blob.name);
+                this.setState({
+                    imgData:filedata
+                });
+            }
         }, "image/png");
     }
     handleCancel = () =>{
@@ -406,18 +478,19 @@ class ModifyArticles extends Component{
             editImageModalVisible:false,
         })
     };
+    //文章上传图片
     ImgSave = () => {
-        fetch('/blog/upload/img',{
+        fetch('/api/upload/img',{
             method: 'POST',
             body:this.state.imgData
         }).then(rep=>{
             return rep.json()
         }).then(json=>{
-            if(json.res.msg){
+            if(json.status === 2){
                 //上传的图片设在在smde中显示
                 //下面2种都可以设置
                 // self.smde.value("![](/uploads/"+1+")");
-                this.smde.codemirror.replaceSelection(`![${this.state.selectImgName}](http://db.mayunyi.top/blog/static${json.res.src[0]})`);
+                this.smde.codemirror.replaceSelection(`![${this.state.selectImgName}](${fileShowUrl}/${json.filePath})`);
                 this.setState({
                     editImageModalVisible:false,
                 })
@@ -480,9 +553,10 @@ class ModifyArticles extends Component{
                     img:this.state.imgList.length==0?"":this.state.imgList[0].url,
                     extra_params:{
                         tagsData:tagsArr
-                    }
+                    },
+                    keyword:values.keyword && values.keyword.replace(/，/g,',').split(',') || [],          //将中文逗号转英文逗号在分割
+                    state:1
                 };
-
                 fetch(`/api/articlelist/edit/${this.props.artliceId}`,{
                     method:"POST",
                     mode: "cors",

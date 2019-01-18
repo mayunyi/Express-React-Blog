@@ -488,15 +488,17 @@ class SendArticle extends Component{
             // maxHeight: 200
         });
         croppedCanvas.toBlob(async blob => {
-            // 图片name添加到blob对象里
-            blob.name = this.state.selectImgName;
-            // 创建提交表单数据对象
-            const filedata = new FormData();
-            // 添加要上传的文件
-            filedata.append('file', blob, blob.name);
-            this.setState({
-                imgData:filedata
-            });
+            if(blob){
+                // 图片name添加到blob对象里
+                blob.name = this.state.selectImgName;
+                // 创建提交表单数据对象
+                const filedata = new FormData();
+                // 添加要上传的文件
+                filedata.append('file', blob, blob.name);
+                this.setState({
+                    imgData:filedata
+                });
+            }
         }, "image/png");
     }
     handleCancel = () =>{
