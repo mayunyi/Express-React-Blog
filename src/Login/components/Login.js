@@ -60,6 +60,8 @@ class WrappedNormalLoginForm extends  Component {
                             this.props.loginIn(true);
                             this.props.history.push("/");
                         })
+                    } else {
+                        message.error(jsontoken.msg)
                     }
                 })
             }

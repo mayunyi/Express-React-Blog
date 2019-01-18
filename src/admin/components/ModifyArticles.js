@@ -235,7 +235,9 @@ class ModifyArticles extends Component{
         });
     };
     handleRemoveFMpic = (file) =>this.setState({ previewImage: '',imgList:[] });
+
     /********                  END             *********/
+
     render() {
         let self = this;
         const { getFieldDecorator } = self.props.form;
@@ -444,6 +446,7 @@ class ModifyArticles extends Component{
             </Spin>
         )
     }
+
     GoBack = () =>{
         this.props.CallBack();
     };
