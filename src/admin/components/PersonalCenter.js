@@ -4,213 +4,41 @@
 import React,{Component} from "react";
 import {getUser} from '../../auth';
 import '../styles/personcenter.css';
-import {Row, Col,Input,Form,Spin,Button,Upload,Icon,message,Modal} from 'antd';
-
-// const Fragment = React.Fragment;
+import {Row, Col,Input,Form,Spin,Button,Upload,Icon,message,Modal,Radio} from 'antd';
+import Cropper from 'react-cropper';
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
+const fileShowUrl = 'http://localhost:5000/api/upload/img';
 
-const formItemLayout = {
-    labelCol: {span: 4},
-    wrapperCol: {span: 20}
-};
-const UPImgLayout = {
-    labelCol: {span: 2},
-    wrapperCol: {span: 22}
-};
 class PersonalCenter extends  Component {
 
     constructor(props){
         super(props);
         this.state = {
-            isEdit:false,
             loading:false,
-            isDisabled:true,
-            iconLoading:false,
-            imgDataUrl:'',         //上传附件的数据
-            previewVisible:false,
-
-            userPhone:getUser().userPhone+11111,
-            userMail:getUser().userMail,
-            userAccount:getUser().userAccount
-        }
+            previewImgVisible:false,
+            previewImage:'',
+            avatar:'',
+            avatarList:[],
+            //裁剪相关设置
+            srcCropper:'',
+            selectImgName:'',
+            selectImgSize:0,
+            selectImgSuffix:'',
+            CropperVisible:false,
+            isEdit:false
+        };
+        this.user = getUser();
     }
 
     componentDidMount(){
-        let userId = getUser().userId;
+
     }
 
 
+    handleImgCancel = () => this.setState({ previewImgVisible: false });
 
-    render() {
-        const { getFieldDecorator } = this.props.form;
-        const { isEdit, loading, isDisabled, imgDataUrl, previewVisible } = this.state;
-
-        const upAction = {
-            action: '/blog/upload/img',
-            headers: {
-                'method':"POST",
-                'mode': "cors",
-                "Access-Control-Allow-Origin":'*'
-            }
-        };
-
-        const upImg = (
-            <Col>
-                <FormItem
-                    {...UPImgLayout}
-                    label="头像上传"
-                >
-                    {getFieldDecorator('imgFile', {
-
-                    })(
-                        <Upload
-                            listType="picture-card"
-                            beforeUpload={this.beforeUpload}
-                            onChange={this.imgChange.bind(this)}
-                            onPreview={this.handlePreview}
-                            onRemove = {this.imgRemove}
-                            {...upAction}
-                        >
-                            {
-                                imgDataUrl ?
-                                    null
-                                    :
-                                    <div>
-                                        <Icon type={this.state.iconLoading ? 'loading' : 'plus'}  />
-                                        <div className="ant-upload-text">上传图片</div>
-                                    </div>
-                            }
-
-                        </Upload>
-                    )}
-
-                </FormItem>
-            </Col>
-        );
-        const imgData= (
-            <Col>
-                <FormItem>
-                    {getFieldDecorator('img', {
-                    })(
-                        <div className="imgDiv">
-                            <img src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"/>
-                        </div>
-                    )}
-                </FormItem>
-            </Col>
-        );
-
-
-
-        return (
-            <Spin tip="修改中..." spinning={loading}>
-                <Form onSubmit={this.handleSubmit}>
-                    <Row>
-                        {
-                            isEdit ? upImg : imgData
-                        }
-                    </Row>
-                    <Row>
-                        <Col span={8}>
-                            <FormItem
-                                {...formItemLayout}
-                                label="电话"
-                            >
-                                {getFieldDecorator('phone', {
-                                    initialValue:this.state.userPhone,
-                                    rules: [
-                                        {
-                                            required: !isDisabled, message: '电话必填!',
-                                        },{
-                                            validator: this.checkValidator
-                                        }
-                                    ],
-                                })(
-                                    <Input disabled={isDisabled} placeholder="请输入电话"/>
-                                )}
-                            </FormItem>
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                {...formItemLayout}
-                                label="邮箱"
-                            >
-                                {getFieldDecorator('email', {
-                                    initialValue:this.state.userMail,
-                                    rules: [{
-                                        required: !isDisabled, message: '邮箱必填!',
-                                    },{
-                                        validator: this.checkValidator
-                                    }],
-                                })(
-                                    <Input disabled={isDisabled} placeholder="请输入邮箱"/>
-                                )}
-                            </FormItem>
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                {...formItemLayout}
-                                label="用户名"
-                            >
-                                {getFieldDecorator('loginNubmer', {
-                                    initialValue:this.state.userAccount,
-                                    rules: [{
-                                        required: !isDisabled, message: '用户名必填!',
-                                    },{
-                                        validator: this.checkValidator
-                                    }],
-                                })(
-                                    <Input disabled={isDisabled} placeholder="请输入用户名"/>
-                                )}
-                            </FormItem>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col span={24} style={{ textAlign: 'right' }}>
-                            {
-                                isEdit ?
-                                    <FormItem>
-                                        <Button type="primary" htmlType="submit">保存</Button>
-                                        <Button style={{ marginLeft: 8 }} type="primary" onClick={this._HandleInfo.bind(this)}>取消</Button>
-                                    </FormItem>
-                                    :
-                                    <FormItem>
-
-                                        <Button style={{ marginLeft: 8 }} type="primary" onClick={this._ChangeInfo.bind(this)}>修改</Button>
-                                    </FormItem>
-                            }
-                        </Col>
-                    </Row>
-                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancelImg}>
-                        <img alt="example" style={{ width: '100%' }} src={imgDataUrl} />
-                    </Modal>
-                </Form>
-            </Spin>
-        )
-    }
-    //取消编辑
-    _HandleInfo(){
-        const {setFieldsValue} = this.props.form;
-        setFieldsValue({
-            phone:getUser().userPhone+11111,
-            email:getUser().userMail,
-            loginNubmer:getUser().userAccount
-        });
-        this.setState({
-            isDisabled:true,
-            isEdit:false,
-        })
-    }
-    //修改用户信息的相关状态
-    _ChangeInfo(){
-        this.setState({
-            isDisabled:false,
-            isEdit:true
-        })
-    }
-
-    //附件上传前校验
-    beforeUpload = (file) =>{
+    beforeUploadAvatar = (file) => {
         const isLt10M = file.size / 1024 / 1024 < 10;
         if (!isLt10M) { //添加文件限制
             message.error('文件大小不能超过10M');
@@ -220,50 +48,268 @@ class PersonalCenter extends  Component {
             message.error('只能上传照片附件');
             return false;
         }
-    };
-    //附件上传完成
-    imgChange(info){
-        const {file,fileList} = info;
-        if (file.status === 'uploading') {
-            this.setState({ iconLoading: true });
-            return;
-        }
-        if (file.status === 'done') {
-            let respone = file.response.res.src;
+        let reader=new FileReader();
+        //头像上传之前弹出裁剪功能
+        reader.readAsDataURL(file); //开始读取文件
+        // 因为读取文件需要时间,所以要在回调函数中使用读取的结果
+        reader.onload = (e) => {
             this.setState({
-                iconLoading:false,
-                imgDataUrl:'http://db.mayunyi.top/blog/static'+respone[0],
-            });
-        }
-    }
+                srcCropper: e.target.result, //cropper的图片路径
+                selectImgName: file.name, //文件名称
+                selectImgSize: (file.size / 1024 / 1024), //文件大小
+                selectImgSuffix: file.type.split("/")[1], //文件类型
+                CropperVisible: true, //打开控制裁剪弹窗的变量，为true即弹窗
+            })
+        };
+        return false;
+    };
 
-    //上传附件预览
-    handlePreview = () => {
-        //这边还还可以上传上传服务器上的附件 需要接口确认
+    handlePreview = (file) => {
         this.setState({
-            previewVisible: true,
+            previewImage: file.url || file.thumbUrl,
+            previewImgVisible: true,
         });
     };
+    handleRemovepic = (file) =>this.setState({ previewImage: '',avatarList:[],avatar:'' });
 
-    //取消图片预览的对话框
-    handleCancelImg = () => this.setState({ previewVisible: false });
+    render() {
+        let self = this;
+        const { getFieldDecorator } = self.props.form;
+        const formItemLayout = {
+            labelCol: {
+                xs: { span: 24 },
+                sm: { span: 8 },
+            },
+            wrapperCol: {
+                xs: { span: 24 },
+                sm: { span: 8 },
+            },
+        };
+        const uploadLayout = {
+            wrapperCol: {
+                sm: { span: 8, offset: 10 },
+            },
+        };
+        const { loading,avatarList,previewImgVisible,previewImage,isEdit } = self.state;
+        const uploadButton = (
+            <div>
+                <Icon type='plus' />
+                <div className="ant-upload-text">上传头像</div>
+            </div>
+        );
+        return (
+            <Spin tip="个人信息保存中..." spinning={loading}>
+                <Form onSubmit={this.handleSubmit}>
+                    <Row>
+                        <Col>
+                            <FormItem
+                                {...uploadLayout}
+                            >
+                                {
+                                    isEdit ?
+                                        <Upload
+                                            listType = "picture-card"
+                                            beforeUpload={this.beforeUploadAvatar}
+                                            onPreview = {this.handlePreview}
+                                            fileList={avatarList}
+                                            onRemove  = {this.handleRemovepic}
+                                        >
+                                            {avatarList.length>0 ? null : uploadButton}
+                                        </Upload>
+                                        :
+                                        <img src={this.user.avatar}/>
+                                }
+                                <Modal visible={previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
+                                    <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                </Modal>
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <FormItem
+                                {...formItemLayout}
+                                label="用户名"
+                            >
+                                {getFieldDecorator('name', {
+                                    initialValue: this.user.userName || '',
+                                    rules: [{
+                                        required: true, message: '请输入用户名!',
+                                    },{
+                                        validator: this.checkValidator
+                                    }],
+                                })(
+                                    <Input disabled={!isEdit} placeholder="请输入用户名"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <FormItem
+                                {...formItemLayout}
+                                label="性别"
+                            >
+                                {getFieldDecorator('sex', {
+                                    initialValue: this.user.sex || 1,
+                                    rules: [{
+                                        required: true, message: '请选择性别!',
+                                    }],
+                                })(
+                                    <RadioGroup disabled={!isEdit}>
+                                        <Radio value={1}>男</Radio>
+                                        <Radio value={2}>女</Radio>
+                                    </RadioGroup>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <FormItem
+                                {...formItemLayout}
+                                label="手机号码"
+                            >
+                                {getFieldDecorator('phone', {
+                                    initialValue: this.user.phone || '',
+                                    rules: [{
+                                        validator: this.checkValidator
+                                    }],
+                                })(
+                                    <Input disabled={!isEdit} placeholder="请输入手机号码"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
 
-    //移除文件
-    imgRemove = () =>{
+                    {
+                        isEdit ?
+                            <Row>
+                                <Col span={2}>
+                                    <FormItem>
+                                        <Button type="primary" onClick={this.handleCancel}>取消</Button>
+                                    </FormItem>
+                                </Col>
+                                <Col span={2} offset={20}>
+                                    <FormItem>
+                                        <Button type="primary" htmlType="submit">保存</Button>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            :
+                            <Row>
+                                <Col span={2} offset={22}>
+                                    <FormItem>
+                                        <Button type="primary" onClick={this.onEdit}>编辑</Button>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                    }
+
+                    <Modal
+                        visible={this.state.CropperVisible}
+                        width = {800}
+                        closable = {false}
+                        footer={[
+                            <Button key="ok" type="primary" onClick={this.ImgSaveCropper}>确认</Button>,
+                            <Button key="handle" onClick={this.handleCancelCropper}>取消</Button>
+                        ]}
+                    >
+                        <Cropper
+                            src={this.state.srcCropper} //图片路径，即是base64的值，在Upload上传的时候获取到的
+                            style={{ height: 400 }}
+                            viewMode={1} //定义cropper的视图模式
+                            zoomable={true} //是否允许放大图像
+                            aspectRatio={16/16} //image的纵横比
+                            guides={true} //显示在裁剪框上方的虚线
+                            background={false} //是否显示背景的马赛克
+                            rotatable={false} //是否旋转
+                            crop={this._crop.bind(this)}
+                            ref='cropper'           //必须指定这个，不然不去不到getCroppedCanvas（）方法
+                        />
+                    </Modal>
+                </Form>
+            </Spin>
+        )
+    }
+
+    handleCancel = () =>{
         this.setState({
-            imgDataUrl:''
+            isEdit:false
         })
     };
 
+    onEdit = () =>{
+        this.setState({
+            isEdit:true
+        })
+    };
 
+    _crop(){
+        const croppedCanvas = this.refs.cropper.getCroppedCanvas({
+            minWidth: 200,
+            minHeight: 200,
+            // width: 200,
+            // height: 200,
+            // maxWidth: 200,
+            // maxHeight: 200
+        });
+
+        croppedCanvas.toBlob(async blob => {
+            if(blob){
+                // 图片name添加到blob对象里
+                blob.name = this.state.selectImgName;
+                // 创建提交表单数据对象
+                const filedata = new FormData();
+                // 添加要上传的文件
+                filedata.append('file', blob, blob.name);
+                this.setState({
+                    imgData:filedata
+                });
+            }
+        }, "image/png");
+    }
+
+    handleCancelCropper = () =>{
+        this.setState({
+            CropperVisible:false,
+        })
+    };
+    //文章上传图片
+    ImgSaveCropper = () => {
+        fetch('/api/upload/img',{
+            method: 'POST',
+            body:this.state.imgData
+        }).then(rep=>{
+            return rep.json()
+        }).then(json=>{
+            if(json.status === 2){
+                let avatarList = [];
+                avatarList.push({
+                    uid: '-1',
+                    name: '头像.png',
+                    status: 'done',
+                    url: fileShowUrl+'/'+json.filePath
+                });
+                this.setState({
+                    CropperVisible:false,
+                    avatarList,
+                    avatar:fileShowUrl+'/'+json.filePath
+                })
+            } else {
+                message.error('上传失败！')
+            }
+        })
+    };
+    //保存
     handleSubmit = (e) =>{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            console.log(err, values)
-            debugger
+            if (!err) {
+                console.log('Received values of form: ', values);
+            }
         })
     };
-
     //自定义校验规则
     checkValidator = (rule, value, callback) =>{
         const { fullField } = rule;
@@ -271,29 +317,23 @@ class PersonalCenter extends  Component {
             case 'phone':
                 if(!(/^1[34578]\d{9}$/.test(value)) && value){
                     callback('请输入有效的手机号码')
-                } else if(!value){
-                    callback()
                 }
+                callback();
                 break;
-            case 'email':
-                if(!(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) && value){
-                    callback('请输入邮箱地址')
-                } else if(!value){
-                    callback()
+            case 'name':
+                if((value.length > 15 || value.length < 2) && value){
+                    callback('用户名称长度在2~15之间(包含2和15)')
                 }
+                callback();
                 break;
-            case 'loginNubmer':
-                if(!(/^[a-zA-Z][a-zA-Z0-9]{3,15}$/.test(value)) && value){
-                    callback('用户名由英文字母和数字组成的4-16位字符，以字母开头')
-                } else if(!value){
-                    callback()
-                }
-                break;
+            // case 'loginNubmer':
+            //     if(!(/^[a-zA-Z][a-zA-Z0-9]{3,15}$/.test(value)) && value){
+            //         callback('用户名由英文字母和数字组成的4-16位字符，以字母开头')
+            //     }
+            //     break;
             default:
                 callback()
         }
-
-
     }
 }
 PersonalCenter = Form.create()(PersonalCenter);
