@@ -4,7 +4,7 @@
  */
 
 import React, { Component } from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import { Layout } from 'antd';
 import HeaderComponent from '../../_component/Header';
 import { Route } from  'react-router-dom';
 import MenuAdmin from '../components/Menu'
@@ -12,6 +12,7 @@ import SendArticle from '../components/SendArticle';
 import TagsAdministration from '../components/TagsAdministration';
 import ArticleAdministration from '../components/ArticleAdministration';
 import PersonalCenter from  '../components/PersonalCenter';
+import EditAbout from  '../components/EditAbout';
 import '../styles/AdminIndex.css'
 const {Content, Footer, Sider,} = Layout;
 
@@ -47,6 +48,7 @@ export default class AdminLayout extends Component {
                             <Route path={`${this.props.match.url}/tagsAdministration`} exact component={TagsAdministration}/>
                             <Route path={`${this.props.match.url}/articleAdministration`} exact component={ArticleAdministration}/>
                             <Route path={`${this.props.match.url}/personalcenter`} exact component={PersonalCenter}/>
+                            <Route path={`${this.props.match.url}/about`} exact component={EditAbout}/>
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>
