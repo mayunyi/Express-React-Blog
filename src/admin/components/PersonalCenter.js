@@ -19,6 +19,9 @@ class PersonalCenter extends  Component {
             previewImgVisible:false,
             previewImage:'',
             avatar:'',
+            phone:'',
+            name:'',
+            sex:1,
             avatarList:[],
             //裁剪相关设置
             srcCropper:'',
@@ -26,13 +29,31 @@ class PersonalCenter extends  Component {
             selectImgSize:0,
             selectImgSuffix:'',
             CropperVisible:false,
-            isEdit:false
+            isEdit:false,
         };
         this.user = getUser();
     }
 
     componentDidMount(){
+        if(this.user.userId){
+            this.getUserInfo()
+        }
+    }
 
+    getUserInfo(){
+        //获取用户信息数据
+        fetch(`/api/users/find/${this.user.userId}`).then(rep=>{
+            return rep.json()
+        }).then(json=>{
+            if(json.status === 2) {
+                this.setState({
+                    avatar:json.data.avatar,
+                    name:json.data.name,
+                    phone:json.data.extra_params.phone || '',
+                    sex:json.data.extra_params.sex || 1,
+                })
+            }
+        })
     }
 
 
@@ -90,7 +111,7 @@ class PersonalCenter extends  Component {
                 sm: { span: 8, offset: 10 },
             },
         };
-        const { loading,avatarList,previewImgVisible,previewImage,isEdit } = self.state;
+        const { loading,avatarList,previewImgVisible,previewImage,isEdit,sex,phone,name,avatar } = self.state;
         const uploadButton = (
             <div>
                 <Icon type='plus' />
@@ -117,7 +138,7 @@ class PersonalCenter extends  Component {
                                             {avatarList.length>0 ? null : uploadButton}
                                         </Upload>
                                         :
-                                        <img src={this.user.avatar}/>
+                                        <img src={avatar} style={{width:150,height:150}}/>
                                 }
                                 <Modal visible={previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
                                     <img alt="example" style={{ width: '100%' }} src={previewImage} />
@@ -132,7 +153,7 @@ class PersonalCenter extends  Component {
                                 label="用户名"
                             >
                                 {getFieldDecorator('name', {
-                                    initialValue: this.user.userName || '',
+                                    initialValue: name || '',
                                     rules: [{
                                         required: true, message: '请输入用户名!',
                                     },{
@@ -151,7 +172,7 @@ class PersonalCenter extends  Component {
                                 label="性别"
                             >
                                 {getFieldDecorator('sex', {
-                                    initialValue: this.user.sex || 1,
+                                    initialValue: sex || 1,
                                     rules: [{
                                         required: true, message: '请选择性别!',
                                     }],
@@ -171,7 +192,7 @@ class PersonalCenter extends  Component {
                                 label="手机号码"
                             >
                                 {getFieldDecorator('phone', {
-                                    initialValue: this.user.phone || '',
+                                    initialValue: phone || '',
                                     rules: [{
                                         validator: this.checkValidator
                                     }],
@@ -236,7 +257,8 @@ class PersonalCenter extends  Component {
     handleCancel = () =>{
         this.setState({
             isEdit:false
-        })
+        });
+        this.getUserInfo()
     };
 
     onEdit = () =>{
@@ -304,9 +326,45 @@ class PersonalCenter extends  Component {
     //保存
     handleSubmit = (e) =>{
         e.preventDefault();
+        if(!this.user.userId){
+            return message.error('请登录账号！')
+        }
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                let userInfo = {
+                    name:values.name,
+                    avatar:this.state.avatar,
+                    extra_params:{
+                        sex:values.sex,
+                        phone:values.phone
+                    }
+                };
+                this.setState({
+                    loading:true
+                });
+                fetch(`/api/users/edit/${this.user.userId}`,{
+                    method:"POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":getUser().token
+                    },
+                    body:  JSON.stringify(userInfo)
+                }).then(rep=>{
+                    return rep.json()
+                }).then(json=>{
+                    if(json.status === 2){
+                        this.setState({
+                            loading:false,
+                            isEdit:false,
+                            avatar:json.data.avatar,
+                            name:json.data.name,
+                            phone:json.data.extra_params.phone || '',
+                            sex:json.data.extra_params.sex || 1,
+                        })
+                    }
+                })
+
             }
         })
     };
