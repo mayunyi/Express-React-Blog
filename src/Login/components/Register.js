@@ -55,7 +55,7 @@ class Register extends  Component {
             if (!err) {
                 let registerObj = {
                     name:values.name,
-                    email:values.email,
+                    email:values.email.toLowerCase(),
                     password:values.password,
                     //avatar:'//p3a.pstatp.com/weili/l/79054095780074136.jpg'
                 };

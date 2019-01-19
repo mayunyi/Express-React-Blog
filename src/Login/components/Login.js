@@ -38,7 +38,7 @@ class WrappedNormalLoginForm extends  Component {
                         "Content-Type": "application/json"
                     },
                     body:  JSON.stringify({
-                        email:values.Username,
+                        email:values.Username.toLowerCase(),
                         password:values.password
                     })
                 }).then(rep=>{
