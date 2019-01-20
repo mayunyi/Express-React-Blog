@@ -50,6 +50,10 @@ class EditAbout extends Component{
             labelCol: {span: 6},
             wrapperCol: {span: 17,offset:6}
         };
+        const decLayout = {
+            labelCol: {span: 2},
+            wrapperCol: {span: 14}
+        }
         getFieldDecorator('keys', { initialValue: [] });
         getFieldDecorator('mrkeys', { initialValue: [] });
         const keys = getFieldValue('keys');
@@ -201,6 +205,25 @@ class EditAbout extends Component{
                 <Form onSubmit={this.onSubmit} >
                     {formItems}
                     {mrItems}
+                    <Row>
+                        <Col>
+                            <FormItem
+                                {... decLayout}
+                                label='自我介绍'
+                            >
+                                {getFieldDecorator(`dec`, {
+                                    rules: [{
+                                        required: true,
+                                        message: '请输入自我介绍!',
+                                    }],
+                                })(
+                                    <Input.TextArea
+                                        placeholder="请输入自我介绍"
+                                    />,
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
                     <Row >
                         <Col>
                             <FormItem>
