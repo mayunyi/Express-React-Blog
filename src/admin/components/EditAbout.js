@@ -74,6 +74,8 @@ class EditAbout extends Component{
                 }).then(json=>{
                     if(json.status === 2){
                         message.success('新增成功')
+                    } else {
+                        message.success(json.msg)
                     }
                 })
 
