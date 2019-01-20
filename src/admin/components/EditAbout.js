@@ -7,28 +7,29 @@ const Option = Select.Option;
 const InputGroup = Input.Group;
 const Fragment = React.Fragment;
 
+let id = 0;
 class EditAbout extends Component{
     constructor(props){
         super(props);
         this.state = {
-            contact:[
-                {
-                    contact_name:'qq',
-                    contact_number:'qq'
-                }
-            ]
+            contact:[]
         }
+    }
+    componentDidMount(){
+        this.add()
     }
 
     onSubmit = (e) =>{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            debugger
+            if (!err) {
+                console.log('Received values of form: ', values);
+            }
         })
     };
     render () {
         let self = this;
-        const { getFieldDecorator } = self.props.form;
+        const { getFieldDecorator,getFieldValue  } = self.props.form;
         const { contact } = self.state;
         const Layout = {
             labelCol: {span: 12},
@@ -38,92 +39,84 @@ class EditAbout extends Component{
             labelCol: {span: 12},
             wrapperCol: {span: 12,offset:12}
         };
+        getFieldDecorator('keys', { initialValue: [] });
+        const keys = getFieldValue('keys');
+        const formItems = keys.map((item,index)=> {
+            return (
+                <Row key ={index}>
+                    <Col span={4}>
+                        <FormItem
+                            {...(index === 0 ? Layout : Layout1)}
+                            label={index === 0 ? '联系方式' : ''}
+                            required={false}
+                            key={index}
+                        >
+                            {getFieldDecorator(`contact_name_${item}`, {
+                                rules: [{
+                                    required: true,
+                                    message: '请输入联系方式!',
+                                }],
+                            })(
+                                <Input
+                                    placeholder="请输入联系方式"
+                                />,
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col span={4} offset={1}>
+                        <Row>
+                            <Col span={16}>
+                                <FormItem>
+                                    {getFieldDecorator(`contact_number_${item}`, {
+                                        rules: [{
+                                            required: true,
+                                            message: '请输入联系号码!',
+                                        }],
+                                    })(
+                                        <Input
+                                            placeholder="请输入联系号码"
+                                        />,
+                                    )}
+                                </FormItem>
+                            </Col>
+                            {
+                                index < 2 &&
+                                <Col span={2} offset={1}>
+                                    {
+                                        0< keys.length < 2 && index+1 == keys.length  ?
+                                            <FormItem>
+                                                <Button shape="circle" size="small" icon="plus" type="primary"
+                                                        onClick={() => this.add()}/>
+                                            </FormItem>
+                                            :
+                                            <FormItem>
+                                                <Button shape="circle" size="small" icon="minus" type="primary"
+                                                        onClick={() => this.remove(item)}/>
+                                            </FormItem>
+                                    }
+                                </Col>
+                            }
+                            {
+                                index+1 == keys.length && index>0 &&
+                                <Col span={2} offset={1}>
+                                    <FormItem>
+                                        <Button shape="circle" size="small" icon="minus" type="primary"
+                                                onClick={() => this.remove(item)}/>
+                                    </FormItem>
+                                </Col>
+                            }
+                        </Row>
+                    </Col>
+                </Row>
+            )
+
+        })
+
         return (
             <Fragment>
                 <Form onSubmit={this.onSubmit} >
                     {
-                        contact.map((item,index)=> {
-
-                            return (
-                                <Row key ={index}>
-                                    <Col span={4}>
-                                        {
-                                            index === 0 ?
-                                                <FormItem
-                                                    {...Layout}
-                                                    label='联系方式'
-                                                >
-                                                    {getFieldDecorator(`contact_name`, {
-                                                        rules: [{
-                                                            required: true,
-                                                            message: '请输入联系方式!',
-                                                        }],
-                                                    })(
-                                                        <Input placeholder="请输入联系方式"/>,
-                                                    )}
-                                                </FormItem>
-                                                :
-                                                <FormItem
-                                                    {...Layout1}
-                                                >
-                                                    {getFieldDecorator(`contact_name`, {
-                                                        rules: [{
-                                                            required: true,
-                                                            message: '请输入联系方式!',
-                                                        }],
-                                                    })(
-                                                        <Input placeholder="请输入联系方式"/>,
-                                                    )}
-                                                </FormItem>
-                                        }
-
-                                    </Col>
-                                    <Col span={4} offset={1}>
-                                        <Row>
-                                            <Col span={16}>
-                                                <FormItem>
-                                                    {getFieldDecorator(`contact_name`, {
-                                                        rules: [{
-                                                            required: true,
-                                                            message: '请输入联系方式!',
-                                                        }],
-                                                    })(
-                                                        <Input placeholder="请输入联系方式"/>,
-                                                    )}
-                                                </FormItem>
-                                            </Col>
-                                            {
-                                                index < 3 &&
-                                                <Col span={2} offset={1}>
-                                                    {
-                                                        contact.length ==1?
-                                                            <FormItem>
-                                                                <Button shape="circle" size="small" icon="plus" type="primary"
-                                                                        onClick={() => this.onLinkWay(index, 'add')}/>
-                                                            </FormItem>
-                                                            :
-                                                            <FormItem>
-                                                                <Button shape="circle" size="small" icon="minus" type="primary"
-                                                                        onClick={() => this.onLinkWay(index, 'minus')}/>
-                                                            </FormItem>
-                                                    }
-
-                                                </Col>
-                                            }
-                                            {
-                                                index > 0 &&
-                                                <Col span={2} offset={1}>
-                                                    <FormItem>
-                                                        <Button shape="circle" size="small" icon="minus" type="primary"
-                                                                onClick={() => this.onLinkWay(index, 'minus')}/>
-                                                    </FormItem>
-                                                </Col>
-                                            }
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            )
-                        })
+                        formItems
                     }
                     <Row >
                         <Col>
@@ -136,17 +129,22 @@ class EditAbout extends Component{
             </Fragment>
         )
     }
-    onLinkWay = (index,type) =>{
-        const { contact } = this.state
-        if(type === 'add'){
-            contact.push({
-                contact_name:'qq',
-                contact_number:'qq'
-            })
-        }
-        this.setState({
-            contact
-        })
+    add = () => {
+        const { form } = this.props;
+        const keys = form.getFieldValue('keys');
+        const nextKeys = keys.concat(++id);
+        form.setFieldsValue({
+            keys: nextKeys,
+        });
+    };
+
+    remove = (k) =>{
+        const { form } = this.props;
+        const { contact } = this.state;
+        const keys = form.getFieldValue('keys');
+        form.setFieldsValue({
+            keys: keys.filter(key => key !== k),
+        });
     }
 }
 EditAbout = Form.create()(EditAbout);
