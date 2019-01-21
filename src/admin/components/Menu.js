@@ -69,6 +69,11 @@ export default class MenuAdmin extends Component{
                     menuKey:['5']
                 });
                 break;
+            case "/admin/resume" :
+                this.setState({
+                    menuKey:['6']
+                });
+                break;
             default:
                 this.setState({
                     menuKey:['1']
@@ -117,6 +122,12 @@ export default class MenuAdmin extends Component{
                     <Link  to="/admin/about">
                         <Icon type="file-text" theme="filled" />
                         <span className="nav-text">编辑关于</span>
+                    </Link>
+                </Menu.Item>
+                <Menu.Item key="6">
+                    <Link  to="/admin/resume">
+                        <Icon type="file-text" theme="filled" />
+                        <span className="nav-text">个人简历</span>
                     </Link>
                 </Menu.Item>
             </Menu>
