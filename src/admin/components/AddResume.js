@@ -1,9 +1,11 @@
 import React,{ Component } from 'react';
-import {Upload,Icon,message,Form, Row, Col,Input,Button,Modal,Spin,Radio,DatePicker} from 'antd'
+import {Upload,Icon,message,Form, Row, Col,Input,Button,Modal,Spin,Radio,DatePicker,Select} from 'antd'
 import {getUser} from '../../auth';
 import Cropper from 'react-cropper';
+import Race from '../../static/data/Race.json'
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+const Option = Select.Option;
 const Fragment = React.Fragment;
 
 const fileShowUrl = 'http://localhost:5000/api/upload/img';
@@ -126,6 +128,14 @@ class AddResume extends Component{
             labelCol: {span: 8},
             wrapperCol: {span: 16}
         };
+        const meLayout = {
+            labelCol: {span: 2},
+            wrapperCol: {span: 22}
+        };
+        const Layout = {
+            labelCol: {span: 6},
+            wrapperCol: {span: 18}
+        };
         const uploadButton = (
             <div>
                 <Icon type='plus' />
@@ -197,7 +207,17 @@ class AddResume extends Component{
                                         message: '请选择种族!',
                                     }],
                                 })(
-                                    <Input placeholder="请选择种族"/>
+                                    <Select
+                                        showSearch
+                                        placeholder='请选择种族,或输入种族名称'
+                                    >
+                                        {
+                                            Race.race.map((item,index)=>{
+                                                return <Option key={index} value = {item.id}>{item.name}</Option>
+
+                                            })
+                                        }
+                                    </Select>
                                 )}
                             </FormItem>
                         </Col>
@@ -281,6 +301,75 @@ class AddResume extends Component{
                                         <Radio value={1}>全职</Radio>
                                         <Radio value={2}>兼职</Radio>
                                     </RadioGroup>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={8}>
+                            <FormItem
+                                label='学历'
+                                {...Layout}
+                            >
+                                {getFieldDecorator(`education`, {
+                                    rules: [{
+                                        required: true,
+                                        message: '请输入学历!',
+                                    }],
+                                })(
+                                    <Input placeholder="请输入学历"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                label='专业'
+                                {...Layout}
+                            >
+                                {getFieldDecorator(`major`, {
+                                    rules: [{
+                                        required: true,
+                                        message: '请输入专业!',
+                                    }],
+                                })(
+                                    <Input placeholder="请输入专业"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                label='兴趣'
+                                {...Layout}
+                            >
+                                {getFieldDecorator(`interest`, {
+                                    rules: [{
+                                        required: true,
+                                        message: '请输入兴趣,以‘、’隔开!',
+                                    }],
+                                })(
+                                    <Input placeholder="请输入兴趣,以‘、’隔开"/>
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={24}>
+                            <FormItem
+                                label='自我评价'
+                                {...meLayout}
+                            >
+                                {getFieldDecorator(`evaluation`, {
+                                    rules: [{
+                                        required: true,
+                                        message: '请输入自我评价!',
+                                    }],
+                                })(
+                                    <Input.TextArea
+                                        placeholder="请输入自我介绍"
+                                        autosize = {
+                                            {minRows:4, maxRows:8}
+                                        }
+                                    />
                                 )}
                             </FormItem>
                         </Col>
