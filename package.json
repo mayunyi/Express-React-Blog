@@ -58,6 +58,7 @@
     "fetch-action": "^0.3.0",
     "highlight.js": "^9.13.1",
     "marked": "^0.5.2",
+    "moment": "^2.24.0",
     "react": "^16.6.3",
     "react-cropper": "^1.0.1",
     "react-dom": "^16.6.3",

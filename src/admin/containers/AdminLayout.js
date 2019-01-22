@@ -37,7 +37,7 @@ export default class AdminLayout extends Component {
                     }}
                 >
                     <div className="logo" >
-                        马海的博客
+                        博客管理后台
                     </div>
                     <MenuAdmin {...this.props}/>
                 </Sider>
