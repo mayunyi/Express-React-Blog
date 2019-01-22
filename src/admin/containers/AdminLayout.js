@@ -12,9 +12,9 @@ import SendArticle from '../components/SendArticle';
 import TagsAdministration from '../components/TagsAdministration';
 import ArticleAdministration from '../components/ArticleAdministration';
 import PersonalCenter from  '../components/PersonalCenter';
-import EditAbout from  '../components/EditAbout';
-import '../styles/AdminIndex.css';
-import Resume from '../components/Resume'
+import About from  '../components/About';
+import Resume from  '../components/Resume';
+import '../styles/AdminIndex.css'
 const {Content, Footer, Sider,} = Layout;
 
 
@@ -49,7 +49,7 @@ export default class AdminLayout extends Component {
                             <Route path={`${this.props.match.url}/tagsAdministration`} exact component={TagsAdministration}/>
                             <Route path={`${this.props.match.url}/articleAdministration`} exact component={ArticleAdministration}/>
                             <Route path={`${this.props.match.url}/personalcenter`} exact component={PersonalCenter}/>
-                            <Route path={`${this.props.match.url}/about`} exact component={EditAbout}/>
+                            <Route path={`${this.props.match.url}/about`} exact component={About}/>
                             <Route path={`${this.props.match.url}/resume`} exact component={Resume}/>
                         </div>
                     </Content>

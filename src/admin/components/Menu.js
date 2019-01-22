@@ -35,6 +35,16 @@ export default class MenuAdmin extends Component{
                     menuKey:['4']
                 });
                 break;
+            case "/admin/about" :
+                this.setState({
+                    menuKey:['5']
+                });
+                break;
+            case "/admin/resume" :
+                this.setState({
+                    menuKey:['6']
+                });
+                break;
             default:
                 this.setState({
                     menuKey:['1']
