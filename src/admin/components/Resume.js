@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 import AddResume from './AddResume';
-import ShowResume from './ShowResume';
+import ShowResume from './ShowAndEditResume';
 import {getUser} from '../../auth';
 const Fragment = React.Fragment;
 

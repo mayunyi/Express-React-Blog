@@ -414,7 +414,6 @@ class ShowAndEditAbout extends Component{
         getFieldDecorator('mrkeys', { initialValue: [] });
         const keys = getFieldValue('keys');
         const mrkeys = getFieldValue('mrkeys');
-        console.log(keys,contact)
         const formItems =  keys.map((item,index) =>{
             return (
                 <Row key ={index}>

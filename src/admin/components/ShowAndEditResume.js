@@ -1,30 +1,33 @@
-import React,{ Component } from 'react';
+import React, { Component } from 'react';
 import {Upload,Icon,message,Form, Row, Col,Input,Button,Modal,Spin,Radio,DatePicker,Select} from 'antd'
 import {getUser} from '../../auth';
 import moment from 'moment';
 import Cropper from 'react-cropper';
 import Race from '../../static/data/Race.json'
+
+
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const Fragment = React.Fragment;
 const { RangePicker } = DatePicker;
-
-
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const Fragment = React.Fragment;
 
 let sillId = 0; //新增技能是使用的id
-let shcoolId =0;
+let schoolId =0;
 let projectId =0;
-class AddResume extends Component{
+const fileShowUrl = 'http://localhost:5000/api/upload/img';
+
+class ShowAndEditResume extends Component{
 
     constructor(props){
         super(props);
         this.state = {
-            avatarList:[],
-            avatar:'',
-            previewImage:'',
-            previewImgVisible:false,
+            sill:[],        //技能
+            school:[],      //学校
+            project:[],     //项目
+            interest:'',
+            isEdit:false,  //  判断是是编辑
+
             //裁剪相关设置
             srcCropper:'',
             selectImgName:'',
@@ -32,65 +35,210 @@ class AddResume extends Component{
             selectImgSuffix:'',
             CropperVisible:false,
 
-            loading:false
+            previewImage:'',
+            previewImgVisible:false,
+            avatarList:[],
+            avatar : "",
+
+            spinLoading:false
         };
         this.user = getUser();
     }
 
     componentDidMount(){
-        this.skillAdd();
-        this.schoolAdd();
-        this.projectAdd();
+        const { form } = this.props;
+        const { data } = this.props;
+
+        let sillData = data.sill;
+        let schoolData = data.school;
+        let projectData = data.project;
+
+        let sill = [],school =[],project=[];
+
+        for(let i =0; i< sillData.length;i++){
+            let keyN = `name_${i+1}`;
+            let keyV = `pre_${i+1}`;
+            sill.push({
+                [keyN]:sillData[i].name,
+                [keyV]:sillData[i].pre
+            });
+            const sillkeys = form.getFieldValue('sillkeys');
+            const nextKeys = sillkeys.concat(++sillId);
+            form.setFieldsValue({
+                sillkeys: nextKeys,
+            });
+        }
+        for(let i =0; i< schoolData.length;i++){
+            let keyS = `school_${i+1}`;
+            let keyT = `schoolDate_${i+1}`;
+            school.push({
+                [keyS]:schoolData[i].name,
+                [keyT]:schoolData[i].time
+            });
+            const schoolkeys = form.getFieldValue('schoolkeys');
+            const nextKeys = schoolkeys.concat(++schoolId);
+            form.setFieldsValue({
+                schoolkeys: nextKeys,
+            });
+        }
+        for(let i =0; i< projectData.length;i++){
+            let keyP = `project_${i+1}`;
+            let keyD = `projectDate_${i+1}`;
+            let keyE = `projectDec_${i+1}`;
+            project.push({
+                [keyP]:projectData[i].name,
+                [keyD]:projectData[i].time,
+                [keyE]:projectData[i].dec
+            });
+            const projectkeys = form.getFieldValue('projectkeys');
+            const nextKeys = projectkeys.concat(++projectId);
+            form.setFieldsValue({
+                projectkeys: nextKeys,
+            });
+        }
+        let avatarList =[];
+        if(data.avatar){
+            avatarList.push({
+                uid: '-1',
+                name: '头像.png',
+                status: 'done',
+                url: data.avatar
+            })
+        }
+        let interest = '';
+        for(let i=0;i<data.interest.length;i++){
+            if(i === data.interest.length-1){
+                interest += data.interest[i]
+            } else {
+                interest += data.interest[i]+'、'
+            }
+        }
+        this.setState({
+            avatar:data.avatar,
+            avatarList,
+            sill,
+            project,
+            school,
+            interest
+        })
     }
 
 
     projectAdd = () =>{
         const { form } = this.props;
-        const projectKeys = form.getFieldValue('projectKeys');
+        const { project } = this.state;
+        const projectKeys = form.getFieldValue('projectkeys');
         const nextKeys = projectKeys.concat(++projectId);
-        form.setFieldsValue({
-            projectKeys: nextKeys,
+        let keyP = `project_${projectId}`;
+        let keyD = `projectDate_${projectId}`;
+        let keyE = `projectDec_${projectId}`;
+        project.push({
+            [keyP]:'',
+            [keyD]:[undefined,undefined],
+            [keyE]:''
         });
+        form.setFieldsValue({
+            projectkeys: nextKeys,
+        });
+        this.setState({
+            project
+        })
     };
     projectRemove = (k) =>{
         const { form } = this.props;
-        const projectKeys = form.getFieldValue('projectKeys');
+        const { project } = this.state;
+        const projectKeys = form.getFieldValue('projectkeys');
+        let newProject = [];
         form.setFieldsValue({
-            projectKeys: projectKeys.filter(key => key !== k),
+            projectkeys: projectKeys.filter(key => key !== k),
         });
+        project.filter(key => {
+            //获取对象key的第一个key
+            let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+            if(k !== Number(keyArr)){
+                newProject.push(key)
+            }
+        });
+        this.setState({
+            project:newProject
+        })
     };
 
     schoolAdd = () =>{
         const { form } = this.props;
-        const schoolKeys = form.getFieldValue('schoolKeys');
-        const nextKeys = schoolKeys.concat(++shcoolId);
+        const { school } = this.state;
+        const schoolKeys = form.getFieldValue('schoolkeys');
+        const nextKeys = schoolKeys.concat(++schoolId);
+        let keyN = `school_${schoolId}`;
+        let keyV = `schoolDate_${schoolId}`;
         form.setFieldsValue({
-            schoolKeys: nextKeys,
+            schoolkeys: nextKeys,
         });
+        school.push({
+            [keyN]:'',
+            [keyV]:[undefined,undefined]
+        });
+        this.setState({
+            school
+        })
     };
     schoolRemove = (k) =>{
         const { form } = this.props;
-        const schoolKeys = form.getFieldValue('schoolKeys');
+        const { school } = this.state;
+        const schoolKeys = form.getFieldValue('schoolkeys');
+        let newSchool = [];
         form.setFieldsValue({
-            schoolKeys: schoolKeys.filter(key => key !== k),
+            schoolkeys: schoolKeys.filter(key => key !== k),
         });
+        school.filter(key => {
+            //获取对象key的第一个key
+            let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+            if(k !== Number(keyArr)){
+                newSchool.push(key)
+            }
+        });
+        this.setState({
+            school:newSchool
+        })
     };
 
     skillAdd = () =>{
         const { form } = this.props;
-        const skillKeys = form.getFieldValue('skillKeys');
+        const { sill } = this.state;
+        const skillKeys = form.getFieldValue('sillkeys');
         const nextKeys = skillKeys.concat(++sillId);
-        form.setFieldsValue({
-            skillKeys: nextKeys,
+        let keyN = `name_${sillId}`;
+        let keyV = `pre_${sillId}`;
+        sill.push({
+            [keyN]:'',
+            [keyV]:''
         });
+        form.setFieldsValue({
+            sillkeys: nextKeys,
+        });
+        this.setState({
+            sill
+        })
     };
     //联系方式删除表格
     skillRemove = (k) =>{
         const { form } = this.props;
-        const skillKeys = form.getFieldValue('skillKeys');
-        form.setFieldsValue({
-            skillKeys: skillKeys.filter(key => key !== k),
+        const skillKeys = form.getFieldValue('sillkeys');
+        const { sill } = this.state;
+        let newSill = [];
+        sill.filter(key => {
+            //获取对象key的第一个key
+            let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+            if(k !== Number(keyArr)){
+                newSill.push(key)
+            }
         });
+        form.setFieldsValue({
+            sillkeys: skillKeys.filter(key => key !== k),
+        });
+        this.setState({
+            sill:newSill
+        })
     };
 
     handleRemovepic = (file) =>this.setState({ previewImage: '',avatarList:[],avatar:'' });
@@ -180,9 +328,10 @@ class AddResume extends Component{
     };
 
 
-    render () {
-        let self = this;
-        const { getFieldDecorator,getFieldValue  } = self.props.form;
+    render(){
+        const { isEdit,avatar,avatarList,previewImgVisible,previewImage,sill,school,project } = this.state;
+        const { data } = this.props;
+        const { getFieldDecorator,getFieldValue } = this.props.form;
         const uploadLayout = {
             wrapperCol: {
                 sm: { span: 8, offset: 10 },
@@ -218,16 +367,16 @@ class AddResume extends Component{
                 <div className="ant-upload-text">上传头像</div>
             </div>
         );
+
         //技能
-        getFieldDecorator('skillKeys', { initialValue: [] });
-        const skillKeys = getFieldValue('skillKeys');
+        getFieldDecorator('sillkeys', { initialValue: [] });
+        const skillKeys = getFieldValue('sillkeys');
         //学校
-        getFieldDecorator('schoolKeys', { initialValue: [] });
-        const schoolKeys = getFieldValue('schoolKeys');
-
-        getFieldDecorator('projectKeys', { initialValue: [] });
-        const projectKeys = getFieldValue('projectKeys');
-
+        getFieldDecorator('schoolkeys', { initialValue: [] });
+        const schoolKeys = getFieldValue('schoolkeys');
+        //项目
+        getFieldDecorator('projectkeys', { initialValue: [] });
+        const projectKeys = getFieldValue('projectkeys');
         const skillFormItem = skillKeys.map((item,index)=>{
             return (
                 <Row key={index}>
@@ -237,12 +386,13 @@ class AddResume extends Component{
                             {...(index === 0 ? Layout : Layout1)}
                         >
                             {getFieldDecorator(`sill_${item}`, {
+                                initialValue: !isEdit ? data.sill[index].name : sill[index][`name_${item}`],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请输入技能!',
                                 }],
                             })(
-                                <Input placeholder="请输入技能"/>
+                                <Input disabled={!isEdit} placeholder="请输入技能" onChange = {(e)=>this.getInputValue(e.target.value,item,'sill','name')}/>
                             )}
                         </FormItem>
                     </Col>
@@ -252,13 +402,16 @@ class AddResume extends Component{
                             {...(index === 0 ? Layout : Layout1)}
                         >
                             {getFieldDecorator(`pre_${item}`, {
+                                initialValue: !isEdit ? data.sill[index].pre : sill[index][`pre_${item}`],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请选择熟练度!',
                                 }],
                             })(
                                 <Select
                                     placeholder='请选择熟练度'
+                                    disabled={!isEdit}
+                                    onChange = {(value)=>this.getInputValue(value,item,'sill','pre')}
                                 >
                                     <Option key={1} value = {25}>了解</Option>
                                     <Option key={2} value = {50}>掌握</Option>
@@ -269,7 +422,7 @@ class AddResume extends Component{
                         </FormItem>
                     </Col>
                     {
-                        index+1 == skillKeys.length?
+                        isEdit && index+1 == skillKeys.length?
                             <Col span={1} offset={1}>
                                 <FormItem>
                                     <Button
@@ -282,20 +435,24 @@ class AddResume extends Component{
                                 </FormItem>
                             </Col>
                             :
-                            <Col span={1} offset={1}>
-                                <FormItem>
-                                    <Button
-                                        shape="circle"
-                                        size="small"
-                                        icon="minus"
-                                        type="primary"
-                                        onClick={() => this.skillRemove(item)}
-                                    />
-                                </FormItem>
-                            </Col>
+                            (
+                                isEdit &&
+                                <Col span={1} offset={1}>
+                                    <FormItem>
+                                        <Button
+                                            shape="circle"
+                                            size="small"
+                                            icon="minus"
+                                            type="primary"
+                                            onClick={() => this.skillRemove(item)}
+                                        />
+                                    </FormItem>
+                                </Col>
+                            )
+
                     }
                     {
-                        index+1 == skillKeys.length && index>0 &&
+                        isEdit && index+1 == skillKeys.length && index>0 &&
                         <Col span={1}>
                             <FormItem>
                                 <Button
@@ -311,7 +468,7 @@ class AddResume extends Component{
                 </Row>
             )
         });
-
+        console.log(project,'render')
         const schoolFormItem = schoolKeys.map((item,index)=>{
             return (
                 <Row key={index}>
@@ -321,12 +478,13 @@ class AddResume extends Component{
                             {...(index === 0 ? Layout : Layout1)}
                         >
                             {getFieldDecorator(`school_${item}`, {
+                                initialValue: !isEdit ? data.school[index].name : school[index][`school_${item}`],
                                 rules: [{
                                     required: true,
                                     message: '请输入学校名称!',
                                 }],
                             })(
-                                <Input placeholder="请输入学校名称"/>
+                                <Input disabled={!isEdit} placeholder="请输入学校名称" onChange = {(e)=>this.getInputValue(e.target.value,item,'school','school')}/>
                             )}
                         </FormItem>
                     </Col>
@@ -336,17 +494,18 @@ class AddResume extends Component{
                             {...(index === 0 ? Layout : Layout1)}
                         >
                             {getFieldDecorator(`schoolDate_${item}`, {
+                                initialValue: !isEdit ? [moment(data.school[index].time[0]),moment(data.school[index].time[1]) ]: [school[index][`schoolDate_${item}`][0]?moment(school[index][`schoolDate_${item}`][0]):school[index][`schoolDate_${item}`][0],school[index][`schoolDate_${item}`][1]?moment(school[index][`schoolDate_${item}`][1]):school[index][`schoolDate_${item}`][0]],
                                 rules: [{
                                     required: true,
                                     message: '请选择入学时间!',
                                 }],
                             })(
-                                <RangePicker format="YYYY-MM-DD"/>
+                                <RangePicker disabled={!isEdit} format="YYYY-MM-DD" onChange = {(data,value)=>this.getInputValue(value,item,'school','schoolDate')}/>
                             )}
                         </FormItem>
                     </Col>
                     {
-                        index+1 == schoolKeys.length?
+                        isEdit && index+1 == schoolKeys.length?
                             <Col span={1} offset={1}>
                                 <FormItem>
                                     <Button
@@ -359,20 +518,23 @@ class AddResume extends Component{
                                 </FormItem>
                             </Col>
                             :
-                            <Col span={1} offset={1}>
-                                <FormItem>
-                                    <Button
-                                        shape="circle"
-                                        size="small"
-                                        icon="minus"
-                                        type="primary"
-                                        onClick={() => this.schoolRemove(item)}
-                                    />
-                                </FormItem>
-                            </Col>
+                            (
+                                isEdit &&
+                                <Col span={1} offset={1}>
+                                    <FormItem>
+                                        <Button
+                                            shape="circle"
+                                            size="small"
+                                            icon="minus"
+                                            type="primary"
+                                            onClick={() => this.schoolRemove(item)}
+                                        />
+                                    </FormItem>
+                                </Col>
+                            )
                     }
                     {
-                        index+1 == schoolKeys.length && index>0 &&
+                        isEdit &&  index+1 == schoolKeys.length && index>0 &&
                         <Col span={1}>
                             <FormItem>
                                 <Button
@@ -397,12 +559,13 @@ class AddResume extends Component{
                             {...(index === 0 ? schoolLayout : schoolLayout1)}
                         >
                             {getFieldDecorator(`project_${item}`, {
+                                initialValue: !isEdit ? data.project[index].name : project[index][`project_${item}`],
                                 rules: [{
                                     required: true,
                                     message: '请输入项目名称!',
                                 }],
                             })(
-                                <Input placeholder="请输入项目名称"/>
+                                <Input disabled={!isEdit} placeholder="请输入项目名称" onChange = {(e)=>this.getInputValue(e.target.value,item,'project','project')}/>
                             )}
                         </FormItem>
                     </Col>
@@ -412,12 +575,18 @@ class AddResume extends Component{
                             {...(index === 0 ? Layout : Layout1)}
                         >
                             {getFieldDecorator(`projectDate_${item}`, {
+                                initialValue: !isEdit ?
+                                    [moment(data.project[index].time[0]),moment(data.project[index].time[1]) ]
+                                    :
+                                    [ project[index][`projectDate_${item}`][0] ? moment(project[index][`projectDate_${item}`][0]):project[index][`projectDate_${item}`][0],
+                                      project[index][`projectDate_${item}`][1]?moment(project[index][`projectDate_${item}`][1]):project[index][`projectDate_${item}`][1]
+                                    ],
                                 rules: [{
                                     required: true,
                                     message: '请选择项目时间!',
                                 }],
                             })(
-                                <RangePicker format="YYYY-MM-DD"/>
+                                <RangePicker disabled={!isEdit} format="YYYY-MM-DD" onChange = {(data,value)=>this.getInputValue(value,item,'project','projectDate')}/>
                             )}
                         </FormItem>
                     </Col>
@@ -427,12 +596,15 @@ class AddResume extends Component{
                             {...(index === 0 ? schoolLayout : schoolLayout1)}
                         >
                             {getFieldDecorator(`projectDec_${item}`, {
+                                initialValue: !isEdit ? data.project[index].dec : project[index][`projectDec_${item}`],
                                 rules: [{
                                     required: true,
                                     message: '请输入项目描述!',
                                 }],
                             })(
                                 <Input.TextArea
+                                    onChange = {(e)=>this.getInputValue(e.target.value,item,'project','projectDec')}
+                                    disabled={!isEdit}
                                     placeholder="请输入项目描述"
                                     autosize = {
                                         {minRows:2, maxRows:4}
@@ -442,7 +614,7 @@ class AddResume extends Component{
                         </FormItem>
                     </Col>
                     {
-                        index+1 == projectKeys.length?
+                        isEdit &&  index+1 == projectKeys.length?
                             <Col span={1} offset={1}>
                                 <FormItem>
                                     <Button
@@ -455,20 +627,24 @@ class AddResume extends Component{
                                 </FormItem>
                             </Col>
                             :
-                            <Col span={1} offset={1}>
-                                <FormItem>
-                                    <Button
-                                        shape="circle"
-                                        size="small"
-                                        icon="minus"
-                                        type="primary"
-                                        onClick={() => this.projectRemove(item)}
-                                    />
-                                </FormItem>
-                            </Col>
+                            (
+                                isEdit &&
+                                <Col span={1} offset={1}>
+                                    <FormItem>
+                                        <Button
+                                            shape="circle"
+                                            size="small"
+                                            icon="minus"
+                                            type="primary"
+                                            onClick={() => this.projectRemove(item)}
+                                        />
+                                    </FormItem>
+                                </Col>
+                            )
+
                     }
                     {
-                        index+1 == projectKeys.length && index>0 &&
+                        isEdit &&  index+1 == projectKeys.length && index>0 &&
                         <Col span={1}>
                             <FormItem>
                                 <Button
@@ -484,24 +660,30 @@ class AddResume extends Component{
                 </Row>
             )
         });
+
         return(
             <Fragment>
-                <Spin tip="数据提交中,主人耐心等待..." spinning = {this.state.loading}>
+                <Spin tip="请稍后..." spinning = {this.state.spinLoading}>
                     <Form onSubmit={this.onSubmit} >
                         <Row>
                             <Col>
                                 <FormItem
                                     {...uploadLayout}
                                 >
-                                    <Upload
-                                        listType = "picture-card"
-                                        beforeUpload={this.beforeUploadAvatar}
-                                        onPreview = {this.handlePreview}
-                                        fileList={this.state.avatarList}
-                                        onRemove  = {this.handleRemovepic}
-                                    >
-                                        {this.state.avatarList.length>0 ? null : uploadButton}
-                                    </Upload>
+                                    {
+                                        isEdit?
+                                            <Upload
+                                                listType = "picture-card"
+                                                beforeUpload={this.beforeUploadAvatar}
+                                                onPreview = {this.handlePreview}
+                                                fileList={this.state.avatarList}
+                                                onRemove  = {this.handleRemovepic}
+                                            >
+                                                {this.state.avatarList.length>0 ? null : uploadButton}
+                                            </Upload>
+                                            :
+                                            <img src={avatar} style={{width:150,height:150}}/>
+                                    }
                                     <Modal visible={this.state.previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
                                         <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
                                     </Modal>
@@ -515,12 +697,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`name`, {
+                                        initialValue: data.name,
                                         rules: [{
                                             required: true,
                                             message: '请输入姓名!',
                                         }],
                                     })(
-                                        <Input placeholder="请输姓名"/>
+                                        <Input disabled={!isEdit} placeholder="请输姓名"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -530,12 +713,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`age`, {
+                                        initialValue: moment(data.age),
                                         rules: [{
                                             required: true,
                                             message: '请选择出生日期!',
                                         }],
                                     })(
-                                        <DatePicker format="YYYY-MM-DD" placeholder="请选择出生日期"/>
+                                        <DatePicker disabled={!isEdit} format="YYYY-MM-DD" placeholder="请选择出生日期"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -545,6 +729,7 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`race`, {
+                                        initialValue: data.race,
                                         rules: [{
                                             required: true,
                                             message: '请选择籍贯!',
@@ -552,6 +737,7 @@ class AddResume extends Component{
                                     })(
                                         <Select
                                             showSearch
+                                            disabled={!isEdit}
                                             placeholder='请选择籍贯,或输入籍贯名称'
                                         >
                                             {
@@ -570,12 +756,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`sex`, {
+                                        initialValue: data.sex,
                                         rules: [{
                                             required: true,
                                             message: '请选择性别!',
                                         }],
                                     })(
-                                        <RadioGroup>
+                                        <RadioGroup disabled={!isEdit}>
                                             <Radio value={'1'}>男</Radio>
                                             <Radio value={'2'}>女</Radio>
                                         </RadioGroup>
@@ -590,12 +777,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`position`, {
+                                        initialValue: data.job.position,
                                         rules: [{
                                             required: true,
                                             message: '请输入职位!',
                                         }],
                                     })(
-                                        <Input placeholder="请输入职位"/>
+                                        <Input disabled={!isEdit} placeholder="请输入职位"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -605,12 +793,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`workingPlace`, {
+                                        initialValue: data.job.workingPlace,
                                         rules: [{
                                             required: true,
                                             message: '请输入工作地点!',
                                         }],
                                     })(
-                                        <Input placeholder="请输入工作地点"/>
+                                        <Input disabled={!isEdit} placeholder="请输入工作地点"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -620,12 +809,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`salary`, {
+                                        initialValue: data.job.salary,
                                         rules: [{
                                             required: true,
                                             message: '请输入薪资!',
                                         }],
                                     })(
-                                        <Input placeholder="请输入薪资"/>
+                                        <Input disabled={!isEdit} placeholder="请输入薪资"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -635,12 +825,13 @@ class AddResume extends Component{
                                     {...jobLayout}
                                 >
                                     {getFieldDecorator(`status`, {
+                                        initialValue: data.job.status,
                                         rules: [{
                                             required: true,
                                             message: '请选择职位类别!',
                                         }],
                                     })(
-                                        <RadioGroup>
+                                        <RadioGroup disabled={!isEdit}>
                                             <Radio value={1}>全职</Radio>
                                             <Radio value={2}>兼职</Radio>
                                         </RadioGroup>
@@ -655,12 +846,13 @@ class AddResume extends Component{
                                     {...Layout}
                                 >
                                     {getFieldDecorator(`education`, {
+                                        initialValue: data.education,
                                         rules: [{
                                             required: true,
                                             message: '请选择学历!',
                                         }],
                                     })(
-                                        <Select placeholder='请选择学历'>
+                                        <Select placeholder='请选择学历' disabled={!isEdit}>
                                             <Option key={1} value = '小学'>小学</Option>
                                             <Option key={2} value = '高中'>高中</Option>
                                             <Option key={3} value = '专科'>专科</Option>
@@ -677,9 +869,9 @@ class AddResume extends Component{
                                     {...Layout}
                                 >
                                     {getFieldDecorator(`major`, {
-                                        //rules: [{required: true, message: '请输入专业!',}],
+                                        initialValue: data.major,
                                     })(
-                                        <Input placeholder="请输入专业"/>
+                                        <Input disabled={!isEdit} placeholder="请输入专业"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -689,12 +881,13 @@ class AddResume extends Component{
                                     {...Layout}
                                 >
                                     {getFieldDecorator(`interest`, {
+                                        initialValue: this.state.interest,
                                         rules: [{
                                             required: true,
                                             message: '请输入兴趣,以‘、’隔开!',
                                         }],
                                     })(
-                                        <Input placeholder="请输入兴趣,以‘、’隔开"/>
+                                        <Input disabled={!isEdit} placeholder="请输入兴趣,以‘、’隔开"/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -733,12 +926,14 @@ class AddResume extends Component{
                                     {...meLayout}
                                 >
                                     {getFieldDecorator(`evaluation`, {
+                                        initialValue: data.evaluation,
                                         rules: [{
                                             required: true,
                                             message: '请输入自我评价!',
                                         }],
                                     })(
                                         <Input.TextArea
+                                            disabled={!isEdit}
                                             placeholder="请输入自我介绍"
                                             autosize = {
                                                 {minRows:4, maxRows:8}
@@ -749,9 +944,16 @@ class AddResume extends Component{
                             </Col>
                         </Row>
                         <Row >
-                            <Col>
+                            {isEdit &&
+                            <Col span={22}>
                                 <FormItem>
-                                    <Button type="primary" htmlType="submit" style = {{float:"right"}}>保存</Button>
+                                    <Button type="primary" htmlType="submit">保存</Button>
+                                </FormItem>
+                            </Col>
+                            }
+                            <Col span={2}>
+                                <FormItem>
+                                    <Button type="primary" style = {{float:"right"}} onClick={isEdit?this.EditHandel:this.Edit}>{isEdit?'取消':'编辑'}</Button>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -782,91 +984,223 @@ class AddResume extends Component{
             </Fragment>
         )
     }
-    onSubmit = (e) =>{
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if(!err){
-                this.setState({
-                    loading:true
+
+    //获取值 要不然取消编辑后数据没有清空
+    getInputValue = (value,index,type,typeValue ) =>{
+        if(type === 'sill'){
+            const { sill } = this.state;
+            sill.filter(key => {
+                //获取对象key的第一个key
+                let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+                if(index == Number(keyArr)){
+                    key[`${typeValue}_${index}`] = value
+                }
+            });
+            this.setState({
+                sill
+            })
+        }
+        if(type === 'school'){
+            const { school } = this.state;
+            school.filter(key => {
+                //获取对象key的第一个key
+                let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+                if(index == Number(keyArr)){
+                    key[`${typeValue}_${index}`] = value
+                }
+            });
+            this.setState({
+                school
+            })
+        }
+        if(type === 'project'){
+            const { project } = this.state;
+            project.filter(key => {
+                //获取对象key的第一个key
+                let keyArr = Object.keys(key)[0].split('_')[1];        //取最后的数值
+                if(index == Number(keyArr)){
+                    key[`${typeValue}_${index}`] = value
+                }
+            });
+            this.setState({
+                project
+            })
+        }
+    };
+
+    //点击取消返回数据对应的动态表格数组
+    sillFormDataChange = (type,data,value) =>{
+        const { form } = this.props;
+        let newData = [];
+        if(type == 'add'){
+            for(let i=0;i< value; i++){
+                const sillKeys = form.getFieldValue('sillkeys');
+                const nextKeys = sillKeys.concat(++sillId);
+                form.setFieldsValue({
+                    sillkeys: nextKeys,
                 });
-                let job = {
-                    position:values.position,
-                    workingPlace:values.workingPlace,
-                    salary:values.salary,
-                    status:values.status
-                };
-                let sill = [];
-                values.skillKeys.map(item=>{
-                    sill.push({
-                        name:values[`sill_${item}`],
-                        pre:values[`pre_${item}`]
-                    })
-                });
-                let school =[];
-                values.schoolKeys.map(item=>{
-                    school.push({
-                        time:[moment(values[`schoolDate_${item}`][0]).format('YYYY-MM-DD'),moment(values[`schoolDate_${item}`][1]).format('YYYY-MM-DD')],
-                        name:values[`school_${item}`]
-                    })
-                });
-                let project = [];
-                values.projectKeys.map(item=>{
-                    project.push({
-                        time:[moment(values[`projectDate_${item}`][0]).format('YYYY-MM-DD'),moment(values[`projectDate_${item}`][1]).format('YYYY-MM-DD')],
-                        name:values[`project_${item}`],
-                        dec:values[`projectDec_${item}`]
-                    })
-                });
-                let subData = {
-                    userId:this.user.userId,
-                    job:job,
-                    sill:sill,
-                    name:values.name,
-                    sex:values.sex,
-                    age:moment(values.age).format('YYYY-MM-DD'),
-                    race:values.race,
-                    education:values.education,
-                    major:values.major,
-                    school:school,
-                    project:project,
-                    evaluation:values.evaluation,           //  自我介绍
-                    interest:values.interest && values.interest.split('、')|| [],
-                    avatar:this.state.avatar
-                };
-                fetch(`/api/resume/add`,{
-                    method:"POST",
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization":this.user.token
-                    },
-                    body:  JSON.stringify(subData)
-                }).then(rep=>{
-                    return rep.json()
-                }).then(json=>{
-                    if(json.status === 2){
-                        this.props.form.resetFields();
-                        this.setState({
-                            loading:false,
-                            avatar:'',
-                            avatarList:[]
-                        });
-                        this.skillAdd();
-                        this.schoolAdd();
-                        this.projectAdd();
-                        this.props.getUserResume();
-                        message.success('新增成功');
-                    } else {
-                        this.setState({
-                            loading:false
-                        });
-                        message.error(json.msg)
-                    }
-                })
             }
+            let sillfromKey = form.getFieldValue('sillkeys');
+            sillfromKey.map((item,index)=>{
+                let keyN = `name_${item}`;
+                let keyV = `pre_${item}`;
+                newData.push({
+                    [keyN]:data.sill[index].name,
+                    [keyV]:data.sill[index].pre
+                });
+            })
+        } else {
+            for(let i=0;i< value; i++){
+                const sillKeys = form.getFieldValue('sillkeys');
+                form.setFieldsValue({
+                    sillkeys: sillKeys.filter(key => key !== sillKeys[sillKeys.length-1]),
+                });
+            }
+            let sillfromKey = form.getFieldValue('sillkeys');
+            sillfromKey.map((item,index)=>{
+                let keyN = `name_${item}`;
+                let keyV = `pre_${item}`;
+                newData.push({
+                    [keyN]:data.sill[index].name,
+                    [keyV]:data.sill[index].pre
+                });
+            });
+        }
+        this.setState({
+            sill:newData
+        })
+    };
+
+    schoolFormDataChange = (type,data,value) =>{
+        const { form } = this.props;
+        let newData = [];
+        if(type == 'add'){
+            for(let i=0;i< value; i++){
+                const schoolKeys = form.getFieldValue('schoolkeys');
+                const nextKeys = schoolKeys.concat(++schoolId);
+                form.setFieldsValue({
+                    schoolkeys: nextKeys,
+                });
+            }
+            let schoolfromKey = form.getFieldValue('schoolkeys');
+            schoolfromKey.map((item,index)=>{
+                let keyN = `school_${item}`;
+                let keyV = `schoolDate_${item}`;
+                newData.push({
+                    [keyN]:data.school[index].name,
+                    [keyV]:data.school[index].time
+                });
+            })
+        } else {
+            for(let i=0;i< value; i++){
+                const schoolKeys = form.getFieldValue('schoolkeys');
+                form.setFieldsValue({
+                    schoolkeys: schoolKeys.filter(key => key !== schoolKeys[schoolKeys.length-1]),
+                });
+            }
+            let schoolfromKey = form.getFieldValue('schoolkeys');
+            schoolfromKey.map((item,index)=>{
+                let keyN = `school_${item}`;
+                let keyV = `schoolDate_${item}`;
+                newData.push({
+                    [keyN]:data.school[index].name,
+                    [keyV]:data.school[index].time
+                });
+            });
+        }
+        this.setState({
+            school:newData
+        })
+    };
+
+    projectFormDataChange = (type,data,value) =>{
+        const { form } = this.props;
+        let newData = [];
+        if(type == 'add'){
+            for(let i=0;i< value; i++){
+                const projectKeys = form.getFieldValue('projectkeys');
+                const nextKeys = projectKeys.concat(++schoolId);
+                form.setFieldsValue({
+                    projectkeys: nextKeys,
+                });
+            }
+            let projectfromKey = form.getFieldValue('projectkeys');
+            projectfromKey.map((item,index)=>{
+                let keyP = `project_${item}`;
+                let keyD = `projectDate_${item}`;
+                let keyE = `projectDec_${item}`;
+                newData.push({
+                    [keyP]:data.project[index].name,
+                    [keyD]:data.project[index].time,
+                    [keyE]:data.project[index].dec
+                });
+            })
+        } else {
+            for(let i=0;i< value; i++){
+                const projectKeys = form.getFieldValue('projectkeys');
+                form.setFieldsValue({
+                    projectkeys: projectKeys.filter(key => key !== projectKeys[projectKeys.length-1]),
+                });
+            }
+            let projectfromKey = form.getFieldValue('projectkeys');
+            projectfromKey.map((item,index)=>{
+                let keyP = `project_${item}`;
+                let keyD = `projectDate_${item}`;
+                let keyE = `projectDec_${item}`;
+                newData.push({
+                    [keyP]:data.project[index].name,
+                    [keyD]:data.project[index].time,
+                    [keyE]:data.project[index].dec
+                });
+            });
+        }
+        this.setState({
+            project:newData
+        })
+    };
+    Edit = () =>{
+        this.setState({
+            isEdit:true
+        })
+    };
+    EditHandel = () =>{
+        const { form,data } = this.props;
+        let sillData = data.sill;
+        let schoolData = data.school;
+        let projectData = data.project;
+        const skillKeys = form.getFieldValue('sillkeys');
+        const schoolKeys = form.getFieldValue('schoolkeys');
+        const projectKeys = form.getFieldValue('projectkeys');
+
+        if (sillData.length > skillKeys.length){
+            let value = sillData.length - skillKeys.length;
+            this.sillFormDataChange('add',data,value)
+        } else {
+            let value = skillKeys.length - sillData.length;
+            this.sillFormDataChange('remove',data,value);
+        }
+
+        if (schoolData.length > schoolKeys.length){
+            let value = schoolData.length - schoolKeys.length;
+            this.schoolFormDataChange('add',data,value)
+        } else {
+            let value = schoolKeys.length - schoolData.length;
+            this.schoolFormDataChange('remove',data,value);
+        }
+        if (projectData.length > projectKeys.length){
+            let value = projectData.length - projectKeys.length;
+            this.projectFormDataChange('add',data,value)
+        } else {
+            let value = projectKeys.length - projectData.length;
+            this.projectFormDataChange('remove',data,value);
+        }
+
+        this.setState({
+            avatar:data.avatar,
+            isEdit:false
         })
     }
 }
 
-AddResume = Form.create()(AddResume);
-export default AddResume
+ShowAndEditResume = Form.create()(ShowAndEditResume);
+export default ShowAndEditResume
