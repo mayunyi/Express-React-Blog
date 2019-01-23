@@ -8,7 +8,7 @@ import ShowResume from './ShowResume';
 import {getUser} from '../../auth';
 const Fragment = React.Fragment;
 
-export default class EditAbout extends Component{
+export default class Resume extends Component{
     constructor(props){
         super(props);
         this.state = {
