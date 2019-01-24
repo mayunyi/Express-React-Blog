@@ -7,6 +7,8 @@ import React, { Component } from 'react';
 import { Skeleton } from 'antd';
 import {getUser} from '../../auth';
 import AboutConent from '../components/AboutConent'
+import CartoonPeople from '../components/CartoonPeople';
+
 const Fragment = React.Fragment;
 export default class AboutLayout extends Component {
     constructor(props){
@@ -53,8 +55,15 @@ export default class AboutLayout extends Component {
         return(
             <Fragment>
                 {
-                    loading?<Skeleton/> : <AboutConent {...this.props} aboutData= {this.state.aboutData}/>
+                    loading ? <Skeleton/>
+                        :
+                        <div>
+                            <AboutConent {...this.props} aboutData= {this.state.aboutData}/>
+                            <CartoonPeople {...this.props}/>
+                        </div>
+
                 }
+
             </Fragment>
         )
     }
