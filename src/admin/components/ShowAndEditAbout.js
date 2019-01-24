@@ -90,6 +90,7 @@ class ShowAndEditAbout extends Component{
         //组件卸载调用
         id =0;
         mrId =0;
+        this.props.form.resetFields();
         this.setState = (state,callback)=>{
             return;
         };

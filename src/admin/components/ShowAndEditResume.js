@@ -123,6 +123,17 @@ class ShowAndEditResume extends Component{
         })
     }
 
+    componentWillUnmount(){
+        //组件卸载调用
+        const { form } = this.props;
+        sillId = 0; //新增技能是使用的id
+        schoolId =0;
+        projectId =0;
+        form.resetFields();
+        this.setState = (state,callback)=>{
+            return;
+        };
+    }
 
     projectAdd = () =>{
         const { form } = this.props;
@@ -376,6 +387,7 @@ class ShowAndEditResume extends Component{
         const schoolKeys = getFieldValue('schoolkeys');
         //项目
         getFieldDecorator('projectkeys', { initialValue: [] });
+        console.log(schoolKeys)
         const projectKeys = getFieldValue('projectkeys');
         const skillFormItem = skillKeys.map((item,index)=>{
             return (
