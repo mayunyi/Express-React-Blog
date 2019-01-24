@@ -660,15 +660,19 @@ class ShowAndEditAbout extends Component{
      */
     FormDataChange = (type,data,value) =>{
         const { form } = this.props;
+
+        id =0;
+        data.contact.map((item,index)=>{
+            const keys = form.getFieldValue('keys');
+            const nextKeys = keys.concat(++index);
+            id = index;
+            form.setFieldsValue({
+                keys: nextKeys,
+            });
+        });
+
         let newData = [];
         if(type == 'add'){
-            for(let i=0;i< value; i++){
-                const keys = form.getFieldValue('keys');
-                const nextKeys = keys.concat(++id);
-                form.setFieldsValue({
-                    keys: nextKeys,
-                });
-            }
             let fromKey = form.getFieldValue('keys');
             fromKey.map((item,index)=>{
                 let keyN = `contact_name_${item}`;
@@ -708,15 +712,25 @@ class ShowAndEditAbout extends Component{
      */
     MRFormDataChange = (type,data,value) =>{
         const { form } = this.props;
+        mrId =0;
+        data.WellknownSaying.map((item,index)=>{
+            const mrkeys = form.getFieldValue('mrkeys');
+            const nextKeys = mrkeys.concat(++index);
+            mrId = index;
+            form.setFieldsValue({
+                mrkeys: nextKeys,
+            });
+        });
+
         let newData = [];
         if(type == 'add'){
-            for(let i=0;i< value; i++){
-                const keys = form.getFieldValue('mrkeys');
-                const nextKeys = keys.concat(++id);
-                form.setFieldsValue({
-                    mrkeys: nextKeys,
-                });
-            }
+            // for(let i=0;i< value; i++){
+            //     const keys = form.getFieldValue('mrkeys');
+            //     const nextKeys = keys.concat(++id);
+            //     form.setFieldsValue({
+            //         mrkeys: nextKeys,
+            //     });
+            // }
             let MrfromKey = form.getFieldValue('mrkeys');
             MrfromKey.map((item,index)=>{
                 let keyN = `WellknownSaying_${item}`;
@@ -746,6 +760,7 @@ class ShowAndEditAbout extends Component{
 
     EditHandel = () =>{
         const { form,data } = this.props;
+        form.resetFields();
         const contact = data.contact;
         const WellknownSaying = data.WellknownSaying;
 

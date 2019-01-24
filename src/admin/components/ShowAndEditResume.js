@@ -468,7 +468,6 @@ class ShowAndEditResume extends Component{
                 </Row>
             )
         });
-        console.log(project,'render')
         const schoolFormItem = schoolKeys.map((item,index)=>{
             return (
                 <Row key={index}>
@@ -480,7 +479,7 @@ class ShowAndEditResume extends Component{
                             {getFieldDecorator(`school_${item}`, {
                                 initialValue: !isEdit ? data.school[index].name : school[index][`school_${item}`],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请输入学校名称!',
                                 }],
                             })(
@@ -496,7 +495,7 @@ class ShowAndEditResume extends Component{
                             {getFieldDecorator(`schoolDate_${item}`, {
                                 initialValue: !isEdit ? [moment(data.school[index].time[0]),moment(data.school[index].time[1]) ]: [school[index][`schoolDate_${item}`][0]?moment(school[index][`schoolDate_${item}`][0]):school[index][`schoolDate_${item}`][0],school[index][`schoolDate_${item}`][1]?moment(school[index][`schoolDate_${item}`][1]):school[index][`schoolDate_${item}`][0]],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请选择入学时间!',
                                 }],
                             })(
@@ -561,7 +560,7 @@ class ShowAndEditResume extends Component{
                             {getFieldDecorator(`project_${item}`, {
                                 initialValue: !isEdit ? data.project[index].name : project[index][`project_${item}`],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请输入项目名称!',
                                 }],
                             })(
@@ -582,7 +581,7 @@ class ShowAndEditResume extends Component{
                                       project[index][`projectDate_${item}`][1]?moment(project[index][`projectDate_${item}`][1]):project[index][`projectDate_${item}`][1]
                                     ],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请选择项目时间!',
                                 }],
                             })(
@@ -598,7 +597,7 @@ class ShowAndEditResume extends Component{
                             {getFieldDecorator(`projectDec_${item}`, {
                                 initialValue: !isEdit ? data.project[index].dec : project[index][`projectDec_${item}`],
                                 rules: [{
-                                    required: true,
+                                    required: isEdit,
                                     message: '请输入项目描述!',
                                 }],
                             })(
@@ -699,7 +698,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`name`, {
                                         initialValue: data.name,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入姓名!',
                                         }],
                                     })(
@@ -715,7 +714,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`age`, {
                                         initialValue: moment(data.age),
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请选择出生日期!',
                                         }],
                                     })(
@@ -731,7 +730,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`race`, {
                                         initialValue: data.race,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请选择籍贯!',
                                         }],
                                     })(
@@ -758,7 +757,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`sex`, {
                                         initialValue: data.sex,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请选择性别!',
                                         }],
                                     })(
@@ -779,7 +778,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`position`, {
                                         initialValue: data.job.position,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入职位!',
                                         }],
                                     })(
@@ -795,7 +794,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`workingPlace`, {
                                         initialValue: data.job.workingPlace,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入工作地点!',
                                         }],
                                     })(
@@ -811,7 +810,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`salary`, {
                                         initialValue: data.job.salary,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入薪资!',
                                         }],
                                     })(
@@ -827,7 +826,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`status`, {
                                         initialValue: data.job.status,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请选择职位类别!',
                                         }],
                                     })(
@@ -848,7 +847,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`education`, {
                                         initialValue: data.education,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请选择学历!',
                                         }],
                                     })(
@@ -883,7 +882,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`interest`, {
                                         initialValue: this.state.interest,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入兴趣,以‘、’隔开!',
                                         }],
                                     })(
@@ -928,7 +927,7 @@ class ShowAndEditResume extends Component{
                                     {getFieldDecorator(`evaluation`, {
                                         initialValue: data.evaluation,
                                         rules: [{
-                                            required: true,
+                                            required: isEdit,
                                             message: '请输入自我评价!',
                                         }],
                                     })(
@@ -1032,14 +1031,16 @@ class ShowAndEditResume extends Component{
     sillFormDataChange = (type,data,value) =>{
         const { form } = this.props;
         let newData = [];
+        sillId = 0;
+        data.sill.map((item,index)=>{
+            const sillKeys = form.getFieldValue('sillkeys');
+            const nextKeys = sillKeys.concat(++index);
+            sillId = index;
+            form.setFieldsValue({
+                sillkeys: nextKeys,
+            });
+        });
         if(type == 'add'){
-            for(let i=0;i< value; i++){
-                const sillKeys = form.getFieldValue('sillkeys');
-                const nextKeys = sillKeys.concat(++sillId);
-                form.setFieldsValue({
-                    sillkeys: nextKeys,
-                });
-            }
             let sillfromKey = form.getFieldValue('sillkeys');
             sillfromKey.map((item,index)=>{
                 let keyN = `name_${item}`;
@@ -1073,15 +1074,17 @@ class ShowAndEditResume extends Component{
 
     schoolFormDataChange = (type,data,value) =>{
         const { form } = this.props;
+        schoolId =0;
+        data.school.map((item,index)=>{
+            const schoolKeys = form.getFieldValue('schoolkeys');
+            const nextKeys = schoolKeys.concat(++index);
+            schoolId = index;
+            form.setFieldsValue({
+                schoolkeys: nextKeys,
+            });
+        });
         let newData = [];
         if(type == 'add'){
-            for(let i=0;i< value; i++){
-                const schoolKeys = form.getFieldValue('schoolkeys');
-                const nextKeys = schoolKeys.concat(++schoolId);
-                form.setFieldsValue({
-                    schoolkeys: nextKeys,
-                });
-            }
             let schoolfromKey = form.getFieldValue('schoolkeys');
             schoolfromKey.map((item,index)=>{
                 let keyN = `school_${item}`;
@@ -1116,14 +1119,16 @@ class ShowAndEditResume extends Component{
     projectFormDataChange = (type,data,value) =>{
         const { form } = this.props;
         let newData = [];
+        projectId = 0;
+        data.project.map((item,index)=>{
+            const projectKeys = form.getFieldValue('projectkeys');
+            const nextKeys = projectKeys.concat(++index);
+            projectId = index;
+            form.setFieldsValue({
+                projectkeys: nextKeys,
+            });
+        });
         if(type == 'add'){
-            for(let i=0;i< value; i++){
-                const projectKeys = form.getFieldValue('projectkeys');
-                const nextKeys = projectKeys.concat(++schoolId);
-                form.setFieldsValue({
-                    projectkeys: nextKeys,
-                });
-            }
             let projectfromKey = form.getFieldValue('projectkeys');
             projectfromKey.map((item,index)=>{
                 let keyP = `project_${item}`;
@@ -1165,18 +1170,20 @@ class ShowAndEditResume extends Component{
     };
     EditHandel = () =>{
         const { form,data } = this.props;
+        form.resetFields();
         let sillData = data.sill;
         let schoolData = data.school;
         let projectData = data.project;
-        const skillKeys = form.getFieldValue('sillkeys');
+
+        const sillKeys = form.getFieldValue('sillkeys');
         const schoolKeys = form.getFieldValue('schoolkeys');
         const projectKeys = form.getFieldValue('projectkeys');
 
-        if (sillData.length > skillKeys.length){
-            let value = sillData.length - skillKeys.length;
+        if (sillData.length > sillKeys.length){
+            let value = sillData.length - sillKeys.length;
             this.sillFormDataChange('add',data,value)
         } else {
-            let value = skillKeys.length - sillData.length;
+            let value = sillKeys.length - sillData.length;
             this.sillFormDataChange('remove',data,value);
         }
 
@@ -1194,7 +1201,6 @@ class ShowAndEditResume extends Component{
             let value = projectKeys.length - projectData.length;
             this.projectFormDataChange('remove',data,value);
         }
-
         this.setState({
             avatar:data.avatar,
             isEdit:false
