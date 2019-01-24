@@ -771,7 +771,7 @@ class AddResume extends Component{
                         style={{ height: 400 }}
                         viewMode={1} //定义cropper的视图模式
                         zoomable={true} //是否允许放大图像
-                        aspectRatio={16/16} //image的纵横比
+                        aspectRatio={9/16} //image的纵横比
                         guides={true} //显示在裁剪框上方的虚线
                         background={false} //是否显示背景的马赛克
                         rotatable={false} //是否旋转

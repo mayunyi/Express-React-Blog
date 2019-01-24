@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import AddAbout from './AddAbout';
 import ShowAndEditAbout from './ShowAndEditAbout';
 import {getUser} from '../../auth';
-
+import { Skeleton } from 'antd';
 const Fragment = React.Fragment;
 
 export default class About extends Component{
@@ -14,7 +14,8 @@ export default class About extends Component{
         super(props);
         this.state = {
             isAboutData:false,  //  判断是是否创建了用户数据
-            data:{}
+            data:{},
+            loading:true
         };
         this.user = getUser();
     }
@@ -25,36 +26,47 @@ export default class About extends Component{
 
     //获取用户关于数据
     getUserAbout = () =>{
+        this.setState({
+            loading:true
+        });
         fetch(`/api/about/user/${this.user.userId}`).then(rep=>{
             return rep.json()
         }).then(json =>{
             if(json.status === 2){
                 this.setState({
                     isAboutData:true,
-                    data:json.data
+                    data:json.data,
+                    loading:false
                 })
             } else if(json.status === 1){
                 this.setState({
                     isAboutData:false,
-                    data:{}
+                    data:{},
+                    loading:false
                 })
             }
         })
     };
 
     render(){
-        const { isAboutData,isEdit } = this.state;
+        const { isAboutData,isEdit,loading } = this.state;
         return(
             <Fragment>
                 {
-                    isAboutData ?
-                        <ShowAndEditAbout
-                            {...this.props}
-                            data = {this.state.data}
-                            getUserAbout = {this.getUserAbout.bind(this)}
-                        />
+                    loading ? <Skeleton />
                         :
-                        <AddAbout {...this.props} getUserAbout = {this.getUserAbout.bind(this)}/>
+                        <Fragment>
+                            {
+                                isAboutData ?
+                                    <ShowAndEditAbout
+                                        {...this.props}
+                                        data={this.state.data}
+                                        getUserAbout={this.getUserAbout.bind(this)}
+                                    />
+                                    :
+                                    <AddAbout {...this.props} getUserAbout={this.getUserAbout.bind(this)}/>
+                            }
+                        </Fragment>
                 }
             </Fragment>
         )

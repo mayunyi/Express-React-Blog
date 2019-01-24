@@ -339,6 +339,90 @@ class ShowAndEditResume extends Component{
     };
 
 
+    //保存
+    onSubmit = (e) =>{
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if(!err){
+                // this.setState({
+                //     spinLoading:true,
+                // });
+                let job = {
+                    position:values.position,
+                    workingPlace:values.workingPlace,
+                    salary:values.salary,
+                    status:values.status
+                };
+                let sill = [];
+                values.sillkeys.map(item=>{
+                    sill.push({
+                        name:values[`sill_${item}`],
+                        pre:values[`pre_${item}`]
+                    })
+                });
+                let school =[];
+                values.schoolkeys.map(item=>{
+                    school.push({
+                        time:[moment(values[`schoolDate_${item}`][0]).format('YYYY-MM-DD'),moment(values[`schoolDate_${item}`][1]).format('YYYY-MM-DD')],
+                        name:values[`school_${item}`]
+                    })
+                });
+                let project = [];
+                values.projectkeys.map(item=>{
+                    project.push({
+                        time:[moment(values[`projectDate_${item}`][0]).format('YYYY-MM-DD'),moment(values[`projectDate_${item}`][1]).format('YYYY-MM-DD')],
+                        name:values[`project_${item}`],
+                        dec:values[`projectDec_${item}`]
+                    })
+                });
+                let subData = {
+                    job:job,
+                    sill:sill,
+                    name:values.name,
+                    sex:values.sex,
+                    age:moment(values.age).format('YYYY-MM-DD'),
+                    race:values.race,
+                    education:values.education,
+                    major:values.major,
+                    school:school,
+                    project:project,
+                    evaluation:values.evaluation,           //  自我介绍
+                    interest:values.interest && values.interest.split('、')|| [],
+                    avatar:this.state.avatar
+                };
+                let resumeId = this.props.data._id;
+                fetch(`/api/resume/edit/${resumeId}`,{
+                    method:"POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization":this.user.token
+                    },
+                    body:  JSON.stringify(subData)
+                }).then(rep=>{
+                    return rep.json()
+                }).then(json=>{
+                    if(json.status === 2){
+                        this.props.getUserResume();      //重新获取用户关于的数据
+                        let self = this;
+                        setTimeout(()=>{
+                            self.setState({
+                                spinLoading:false,
+                                isEdit:false
+                            });
+                            message.success('编辑成功');
+                        },1000)
+                    }else {
+                        this.setState({
+                            spinLoading:false,
+                        });
+                        message.error(json.msg)
+                    }
+                })
+            }
+        })
+    };
+
     render(){
         const { isEdit,avatar,avatarList,previewImgVisible,previewImage,sill,school,project } = this.state;
         const { data } = this.props;
@@ -387,7 +471,7 @@ class ShowAndEditResume extends Component{
         const schoolKeys = getFieldValue('schoolkeys');
         //项目
         getFieldDecorator('projectkeys', { initialValue: [] });
-        console.log(schoolKeys)
+
         const projectKeys = getFieldValue('projectkeys');
         const skillFormItem = skillKeys.map((item,index)=>{
             return (
@@ -687,7 +771,7 @@ class ShowAndEditResume extends Component{
                                                 listType = "picture-card"
                                                 beforeUpload={this.beforeUploadAvatar}
                                                 onPreview = {this.handlePreview}
-                                                fileList={this.state.avatarList}
+                                                fileList={avatarList}
                                                 onRemove  = {this.handleRemovepic}
                                             >
                                                 {this.state.avatarList.length>0 ? null : uploadButton}
@@ -695,8 +779,8 @@ class ShowAndEditResume extends Component{
                                             :
                                             <img src={avatar} style={{width:150,height:150}}/>
                                     }
-                                    <Modal visible={this.state.previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
-                                        <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                    <Modal visible={previewImgVisible} footer={null} onCancel={this.handleImgCancel}>
+                                        <img alt="example" style={{ width: '100%' }} src={previewImage} />
                                     </Modal>
                                 </FormItem>
                             </Col>
@@ -1175,11 +1259,13 @@ class ShowAndEditResume extends Component{
             project:newData
         })
     };
+    //开始编辑
     Edit = () =>{
         this.setState({
             isEdit:true
         })
     };
+    //取消编辑
     EditHandel = () =>{
         const { form,data } = this.props;
         form.resetFields();
