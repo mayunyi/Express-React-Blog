@@ -317,7 +317,7 @@ class AddAbout extends Component{
                                     message: '请输入名言名句!',
                                 }],
                             })(
-                                <Input
+                                <Input.TextArea
                                     placeholder="请输入名言名句"
                                 />,
                             )}

@@ -1,0 +1,75 @@
+
+/***
+    头像转动
+ */
+
+@-webkit-keyframes rotation{
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+
+.avatar {
+    position: relative;
+    text-align: center;
+}
+
+.avatar > img{
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    margin: 20px;
+    -webkit-transform: rotate(360deg);
+    animation: rotation 3s linear infinite;
+    -moz-animation: rotation 3s linear infinite;
+    -webkit-animation: rotation 3s linear infinite;
+    -o-animation: rotation 3s linear infinite;
+    border: 1px solid rgba(0, 0, 0, 0.016);
+    box-shadow: rgb(255, 25, 46) 0px 1px 20px;
+}
+
+/**
+ * 文字穿透遮罩层
+ */
+/*.about-me,h1{*/
+    /*background:url('../../static/images/about.jpg');*/
+    /*background-size: 100% 100%;*/
+/*}*/
+/*.about-me h1,*/
+/*.about-me::after{*/
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+/*}*/
+/*.about-me{*/
+    /*position: relative;*/
+    /*width: 100%;*/
+    /*height: 100vh;*/
+/*}*/
+/*.about-me::after{*/
+    /*content: '';*/
+    /*background: rgba(0,0,0,0.8);*/
+/*}*/
+/*h1{*/
+    /*font-size: 50px;*/
+    /*z-index: 2;*/
+    /*-webkit-text-fill-color: transparent;*/
+    /*-webkit-background-clip: text;*/
+/*}*/
+
+.about-me{
+    width: 100%;
+    text-align: center;
+    margin: 20px 0px;
+}
+.about-me h1 {
+    font-size: 50px;
+}
+
+.about-me li {
+    list-style-type:none;
+    font-size: 16px;
+    line-height: 45px;
+    margin: 0 300px;
+}
