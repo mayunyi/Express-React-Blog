@@ -1,4 +1,5 @@
 import React,{ Component } from 'react';
+import decMe from '../../static/images/resume1.png'
 
 const Fragment = React.Fragment;
 
@@ -8,7 +9,7 @@ export default class ResumePage  extends Component {
         this.state = {
             bannerList: [                 //盒子背景颜色
                 {
-                    bg: "#f6f6f6"
+                    bg: "#000000"
                 },
                 {
                     bg: "#87d9e1"
@@ -78,7 +79,14 @@ export default class ResumePage  extends Component {
     render() {
 
         let fullPage = this.state.bannerList.map((i, index) => {
-            return <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>{index}</div>
+            if(index === 0){
+                debugger
+                return <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                    <img src = {i.bg} style={{'height': this.state.offsetheight + 'px'}}/>
+                </div>
+            } else{
+                return <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>{index}</div>
+            }
         });
         let fullList = this.state.bannerList.map((i, index) => {
             return <div key={index} className={this.state.fullPage === index ? 'color' : ''}
