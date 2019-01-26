@@ -47,7 +47,14 @@ const AboutConent = (props) =>{
                     }
                 </ul>
             </div>
-
+            <div className="about-me">
+                <h1>我的简介</h1>
+                <ul>
+                    {
+                        aboutData.dec && <li>{aboutData.dec}</li>
+                    }
+                </ul>
+            </div>
         </Fragment>
     )
 
