@@ -1,6 +1,7 @@
 import React,{ Component } from 'react';
-import decMe from '../../static/images/resume1.png'
-
+import {getUser} from "../../auth";
+import '../styles/ResumePage.css';
+import {message} from 'antd'
 const Fragment = React.Fragment;
 
 export default class ResumePage  extends Component {
@@ -9,7 +10,7 @@ export default class ResumePage  extends Component {
         this.state = {
             bannerList: [                 //盒子背景颜色
                 {
-                    bg: "#000000"
+                    bg: ""
                 },
                 {
                     bg: "#87d9e1"
@@ -24,15 +25,48 @@ export default class ResumePage  extends Component {
             offsetheight: document.documentElement.clientHeight -64,    //获取当前页面的高度
             fullPage: 0,           //当前在第几页
             fullPageNum: false        //是否在滑动
-        }
+        };
+        this.user =getUser();
     }
 
     componentDidMount() {
-        //添加鼠标滑动事件
-        if (document.addEventListener) {
-            document.addEventListener('DOMMouseScroll', this.scroll.bind(this), false);
+        if(!this.user.userId){
+            return message.warning('请登录！')
+        } else{
+            this.getResumeData(this.user.userId)
+            //添加鼠标滑动事件
+            if (document.addEventListener) {
+                document.addEventListener('DOMMouseScroll', this.scroll.bind(this), false);
+            }
+            window.onmousewheel = document.onmousewheel = this.scroll.bind(this);
         }
-        window.onmousewheel = document.onmousewheel = this.scroll.bind(this);
+    }
+
+    getResumeData(userId){
+        fetch(`/api/resume/user/${userId}`).then(rep=>{
+            return rep.json()
+        }).then(json=>{
+            if(json.status === 2){
+                let avatarObj = {
+                    avatarDec:'世上只有想不通的人，没有走不通的路。',
+                    avatar:json.data.avatar
+                };
+                let userInfo = {
+                    education:json.data.education,
+                    name:json.data.name,
+                    sex:json.data.sex,
+                    major:json.data.major,
+                    race:json.data.race,
+                    age:json.data.age,
+                    race:json.data.race,
+                }
+
+
+                debugger
+            } else {
+
+            }
+        })
     }
 
     //点击左侧小点时跳转到相应的page
@@ -80,10 +114,7 @@ export default class ResumePage  extends Component {
 
         let fullPage = this.state.bannerList.map((i, index) => {
             if(index === 0){
-                debugger
-                return <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
-                    <img src = {i.bg} style={{'height': this.state.offsetheight + 'px'}}/>
-                </div>
+                return <div key={index} className='resume_me' style={{'height': this.state.offsetheight + 'px'}}></div>
             } else{
                 return <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>{index}</div>
             }

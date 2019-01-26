@@ -4,7 +4,8 @@
  */
 import React from "react";
 import '../style/AboutConent.css'
-
+import {Link} from "react-router-dom"
+import { getUser } from "../../auth";
 const Fragment = React.Fragment;
 const AboutConent = (props) =>{
     const aboutData = props.aboutData;
@@ -53,6 +54,9 @@ const AboutConent = (props) =>{
                     {
                         aboutData.dec && <li>{aboutData.dec}</li>
                     }
+                    <li>
+                        <Link to={`/resume/${getUser().userId}`}>我的简历</Link>
+                    </li>
                 </ul>
             </div>
         </Fragment>

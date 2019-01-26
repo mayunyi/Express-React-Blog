@@ -388,7 +388,10 @@ class ShowAndEditResume extends Component{
                     project:project,
                     evaluation:values.evaluation,           //  自我介绍
                     interest:values.interest && values.interest.split('、')|| [],
-                    avatar:this.state.avatar
+                    avatar:this.state.avatar,
+                    qq:values.qq,
+                    phone:values.phone,
+                    email:values.email
                 };
                 let resumeId = this.props.data._id;
                 fetch(`/api/resume/edit/${resumeId}`,{
@@ -422,7 +425,29 @@ class ShowAndEditResume extends Component{
             }
         })
     };
-
+    //自定义校验规则
+    validatePhone = (rule, value, callback) =>{
+        const { fullField } = rule;
+        switch(fullField){
+            case 'phone':
+                if(!(/^1[34578]\d{9}$/.test(value)) && value){
+                    callback('请输入有效的手机号码')
+                } else if(!value){
+                    callback()
+                }
+                break;
+            case 'email':
+                if(!(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) && value){
+                    callback('请输入邮箱地址')
+                } else if(!value){
+                    callback()
+                }
+                break;
+            default:
+                callback()
+        }
+        callback()
+    };
     render(){
         const { isEdit,avatar,avatarList,previewImgVisible,previewImage,sill,school,project } = this.state;
         const { data } = this.props;
@@ -983,6 +1008,55 @@ class ShowAndEditResume extends Component{
                                         }],
                                     })(
                                         <Input disabled={!isEdit} placeholder="请输入兴趣,以‘、’隔开"/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={8}>
+                                <FormItem
+                                    label='手机号码'
+                                    {...Layout}
+                                >
+                                    {getFieldDecorator(`phone`, {
+                                        initialValue: data.phone,
+                                        rules: [{
+                                            required: isEdit,
+                                            message: '请输入手机号码!',
+                                        }, {
+                                            validator: this.validatePhone,
+                                        }],
+                                    })(
+                                        <Input disabled={!isEdit} placeholder="请输入手机号码"/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={8}>
+                                <FormItem
+                                    label='Email'
+                                    {...Layout}
+                                >
+                                    {getFieldDecorator(`email`, {
+                                        initialValue: data.email,
+                                        rules: [{
+                                            type: 'email', message: '输入的不是EMAIL地址!',
+                                        }, {
+                                            required: isEdit, message: '请输入EMAIL地址!',
+                                        }],
+                                    })(
+                                        <Input disabled={!isEdit} placeholder="请输入email账号"/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={8}>
+                                <FormItem
+                                        label='QQ'
+                                    {...Layout}
+                                >
+                                    {getFieldDecorator(`qq`, {
+                                        initialValue: data.qq,
+                                    })(
+                                        <Input disabled={!isEdit} placeholder="请输入QQ账号"/>
                                     )}
                                 </FormItem>
                             </Col>

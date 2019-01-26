@@ -1,6 +1,5 @@
 import React,{ Component } from 'react';
 import HeaderComponent from '../_component/Header';
-import './styles/index.css';
 import ResumePage from './component/RemusePage'
 const Fragment = React.Fragment;
 

@@ -24,3 +24,7 @@
 .fixed-list div.color{
     background:#000;
 }
+
+.resume_me{
+    background-image: url("../../static/images/resume1.png");
+}
