@@ -59,8 +59,10 @@ export default class ResumePage  extends Component {
                     race:json.data.race,
                     age:json.data.age,
                     race:json.data.race,
+                    qq:json.data.qq,
+                    phone:json.data.phone,
+                    email:json.data.email,
                 }
-
 
                 debugger
             } else {
