@@ -28,3 +28,161 @@
 .resume_me{
     background-image: url("../../static/images/resume1.png");
 }
+
+.cen_con {
+    width: 50%;
+    height: 60%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    text-align: center;
+    overflow: hidden;
+}
+.portrait {
+    height: 32%;
+    margin: 0 auto 8%;
+    padding: 6px;
+    text-align: center;
+}
+.portrait img {
+    height: 200px;
+    width: 200px;
+    vertical-align: middle;
+    border-radius: 50%;
+}
+.cen_text {
+    height: 60%;
+}
+.cen_text h2 {
+    height: 18%;
+    min-height: 38px;
+    margin: 0;
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+}
+
+.cen_text h3 {
+    height: 18%;
+    min-height: 32px;
+    margin: 0;
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    color: white;
+}
+
+.userInfo{
+    width: 60%;
+    margin: 0 auto 0;
+    padding: 5% 0;
+    overflow: hidden;
+    font-family: 'youyuan';
+}
+
+.userInfo table {
+    width: 100%;
+    margin: 20px auto;
+}
+.userInfo table td, th {
+    font-size: 1.8rem;
+    padding: 15px 15px 15px 150px;
+    text-align: left;
+}
+.userInfo table tr td img {
+    border-radius: 50%;
+    height: 200px;
+    width: 200px;
+}
+
+.job{
+    width: 60%;
+    margin: 0 auto 0;
+    padding: 5% 0;
+    overflow: hidden;
+    font-family: 'youyuan';
+}
+.job table {
+    width: 100%;
+    margin: 175px auto;
+}
+.job table td, th {
+    font-size: 1.8rem;
+    padding: 15px 15px 15px 150px;
+    text-align: left;
+}
+.school{
+    width: 60%;
+    margin: 0 auto 0;
+    overflow: hidden;
+    font-family: 'youyuan';
+}
+.school table {
+    width: 100%;
+    margin: 0px auto;
+}
+.school table td, th {
+    font-size: 1.8rem;
+    padding: 15px 15px 15px 150px;
+    text-align: left;
+}
+.Title{
+    width: 60%;
+    margin: 0 auto 0;
+    overflow: hidden;
+    font-family: 'youyuan';
+}
+.Title_wrap{
+    text-align: center;
+}
+.Title_wrap h1 {
+    width: 100%;
+    margin: 30px auto 50px;
+    position: relative;
+    line-height: 4.2rem;
+    font-size: 2rem;
+}
+
+@-webkit-keyframes left_widthsmaller {
+    0% {
+        width:100%;
+    }
+    100% {
+        width:0%;
+    }
+}
+
+/*.Title_wrap h1:after{*/
+    /*content:"";*/
+    /*width: 100%;*/
+    /*position: absolute;*/
+    /*bottom: -20px;*/
+    /*left: 0;*/
+    /*border: 1px dashed #d9d9d9;*/
+    /*animation: left_widthsmaller 25s linear 1s infinite;*/
+/*}*/
+/*.Title_wrap .scissors{*/
+    /*width: 0%;*/
+    /*height: 20px;*/
+    /*position: absolute;*/
+    /*right: 0;*/
+    /*animation: left_widthsmaller 25s linear 1s infinite;*/
+/*}*/
+
+/*.Title_wrap span{*/
+    /*width: 20px;*/
+    /*height: 20px;*/
+    /*float: left;*/
+    /*margin-top: -40px;*/
+    /*background:url(../../static/images/sprite_img.png) no-repeat -37px -50px;*/
+/*}*/
