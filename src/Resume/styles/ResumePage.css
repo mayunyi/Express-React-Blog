@@ -153,19 +153,62 @@
 }
 .Title_wrap h1 {
     width: 100%;
-    margin: 30px auto 50px;
+    margin: 10px auto;
     position: relative;
     line-height: 4.2rem;
     font-size: 2rem;
 }
+.sill{
+    width: 60%;
+    margin: 0 auto 0;
+    /*padding: 5% 0;*/
+    overflow: hidden;
+    font-family: 'youyuan';
+    text-align: center;
+}
 
+.sill table {
+    width: 100%;
+    margin: 0px auto;
+}
+.sill table td, th {
+    /*font-size: 1.8rem;*/
+    font-size: 20px;
+    padding: 15px 15px 15px 150px;
+    text-align: left;
+}
+.project{
+    width: 60%;
+    margin: 0 auto 0;
+    /*padding: 5% 0;*/
+    overflow: hidden;
+    font-family: 'youyuan';
+}
 
+.project_name h3 {
+    float: left;
+    font-size: 1.17em;
+}
+.project_name strong {
+    float: right;
+}
+
+.project_dec{
+    width: 100%;
+    margin: 0 auto 0;
+
+    /** 文本区域无边框 透明背景*/
+    resize: none;
+    background: transparent;
+    border-style: none;
+}
 .evaluation{
     width: 60%;
     margin: 0 auto 0;
     padding: 5% 0;
     overflow: hidden;
     font-family: 'youyuan';
+    font-size: large;
 }
 .evaluation_dec{
     width: 100%;
@@ -175,6 +218,7 @@
     /** 文本区域无边框 透明背景*/
     background: transparent;
     border-style: none;
+    resize: none;
 }
 
 @-webkit-keyframes left_widthsmaller {

@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import {getUser} from "../../auth";
 import '../styles/ResumePage.css';
-import {message} from 'antd'
+import {message,Progress} from 'antd'
 const Fragment = React.Fragment;
 
 export default class ResumePage  extends Component {
@@ -29,7 +29,9 @@ export default class ResumePage  extends Component {
             window.onmousewheel = document.onmousewheel = this.scroll.bind(this);
             this.getResumeData(this.user.userId);
         }
+
     }
+
 
     componentWillUnmount(){
         //组件卸载调用
@@ -187,7 +189,7 @@ export default class ResumePage  extends Component {
                                         </tr>
                                         <tr>
                                             <td>{`籍贯 | ${i.data.race}`}</td>
-                                            <td>户籍 | 江苏省常州市</td>
+                                            <td>{`居住地 | ${this.state.resumeData.job.workingPlace}`}</td>
                                         </tr>
                                         <tr>
                                             <td>{`学历 | ${i.data.education}`}</td>
@@ -272,16 +274,66 @@ export default class ResumePage  extends Component {
                 case 'sill':
                     return (
                         <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
-                            <div className='userInfo'>
+                            <div className='Title'>
+                                <div className='Title_wrap'>
+                                    <h1>技能</h1>
+                                </div>
+                            </div>
+                            <div className='sill'>
+                                {
+                                    i.data.map((item,index)=>{
+                                        return(
+                                            <Progress
+                                                key = {index}
+                                                percent={item.pre}
+                                                type="circle"
+                                                format={percent => `${percent}% ${item.name}`}
+                                                //width = {200}
+                                                style = {{padding:20}}
+                                            />
 
+                                        )
+                                    })
+                                }
+                                <table>
+                                    <tbody>
+                                    {
+                                        i.data.map((item,key)=>{
+                                            return (
+                                                <tr key={key+'_'+item.name}>
+                                                    <td>{`${item.name}`}</td>
+                                                    <td>{`熟练度 | ${item.pre}%`}</td>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     );
                 case 'project':
                     return (
                         <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
-                            <div className='userInfo'>
-
+                            <div className='project'>
+                                <div className='Title'>
+                                    <div className='Title_wrap'>
+                                        <h1>项目经验</h1>
+                                    </div>
+                                </div>
+                                {
+                                    i.data.map((item,project)=>{
+                                        return(
+                                            <div>
+                                                <div className="project_name">
+                                                    <h3>{item.name}</h3>
+                                                    <strong>{item.time[0] + ' ~ ' + item.time[1]} </strong>
+                                                </div>
+                                                <textarea className="project_dec" defaultValue = {item.dec} disabled={true}/>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
                     );
@@ -294,9 +346,7 @@ export default class ResumePage  extends Component {
                                         <h1>自我评价</h1>
                                     </div>
                                 </div>
-                                <textarea className="evaluation_dec" defaultValue = {i.data} disabled="false">
-                                    {/*<div dangerouslySetInnerHTML={{ __html: i.data}}/>*/}
-                                </textarea>
+                                <textarea className="evaluation_dec" defaultValue = {i.data} disabled={true}/>
                             </div>
                         </div>
                     );
