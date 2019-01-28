@@ -3,6 +3,13 @@ import {getUser} from "../../auth";
 import '../styles/ResumePage.css';
 import {message,Progress} from 'antd'
 const Fragment = React.Fragment;
+import haitun from '../../static/images/haitun.jpeg';
+import schoolImg from '../../static/images/school.jpg'
+import jobImg from '../../static/images/job.jpg'
+import avatarImg from "../../static/images/resume1.png"
+import sillImg from "../../static/images/sill.jpg"
+import projectImg from "../../static/images/project.jpg"
+import evaluationImg from "../../static/images/evaluation.jpg"
 
 export default class ResumePage  extends Component {
     constructor(props) {
@@ -66,31 +73,31 @@ export default class ResumePage  extends Component {
                 let resumeArr = [
                     {
                         data:avatarObj,
-                        bg:'',
+                        bg:avatarImg,
                         type:'avatar'
                     },{
                         data:userInfo,
-                        bg: "#87d9e1",
+                        bg: haitun,
                         type:'user'
                     },{
-                        bg: "#8185d7",
+                        bg: schoolImg,
                         data:json.data.job,
                         type:'job'
                     },{
-                        bg: "#c60cff",
+                        bg: jobImg,
                         data:schoolAndInsterst,
                         type:'school'
                     },{
-                        bg: "#c5d76a",
+                        bg: sillImg,
                         data:json.data.sill,
                         type:'sill'
 
                     },{
-                        bg: "#d74824",
+                        bg: projectImg,
                         data:json.data.project,
                         type:'project'
                     },{
-                        bg: "#d74ec8",          //自我评价
+                        bg: evaluationImg,          //自我评价
                         data:json.data.evaluation,
                         type:'evaluation'
                     }
@@ -154,7 +161,15 @@ export default class ResumePage  extends Component {
             switch (i.type) {
                 case 'avatar':
                     return (
-                        <div key={index} className='resume_me' style={{'height': this.state.offsetheight + 'px'}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='cen_con'>
                                 <div className='portrait'>
                                     <img src={i.data.avatar}/>
@@ -169,7 +184,15 @@ export default class ResumePage  extends Component {
                     );
                 case 'user':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='userInfo'>
                                 <table>
                                     <tbody>
@@ -204,7 +227,14 @@ export default class ResumePage  extends Component {
                     );
                 case 'job':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div key={index}
+                             style={{
+                                 height: this.state.offsetheight + 'px',
+                                 backgroundRepeat:'no-repeat',
+                                 backgroundSize:'cover',
+                                 backgroundImage: "url(" + i.bg + ")",
+                             }}
+                        >
                             <div className='job'>
                                 <table>
                                     <tbody>
@@ -223,13 +253,18 @@ export default class ResumePage  extends Component {
                     );
                 case 'school':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='Title'>
                                 <div className='Title_wrap'>
                                     <h1>教育经历</h1>
-                                    {/*<div className="scissors">*/}
-                                        {/*<span></span>*/}
-                                    {/*</div>*/}
                                 </div>
                             </div>
                             <div className='school'>
@@ -248,20 +283,17 @@ export default class ResumePage  extends Component {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className='Title_wrap'>
+                            <div className='Title_wrap Like'>
                                 <h1>我的爱好</h1>
-                                {/*<div className="scissors">*/}
-                                {/*<span></span>*/}
-                                {/*</div>*/}
                             </div>
-                            <div className='school'>
+                            <div className='school Like'>
                                 <table>
                                     <tbody>
                                         <tr >
                                             {
                                                 i.data.interest.map((item,key)=>{
                                                     return (
-                                                            <td  key={key+'_'+item}>{item}</td>
+                                                        <td key={ key+'_'+item }>{item}</td>
                                                     )
                                                 })
                                             }
@@ -273,7 +305,15 @@ export default class ResumePage  extends Component {
                     );
                 case 'sill':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='Title'>
                                 <div className='Title_wrap'>
                                     <h1>技能</h1>
@@ -284,7 +324,7 @@ export default class ResumePage  extends Component {
                                     i.data.map((item,index)=>{
                                         return(
                                             <Progress
-                                                key = {index}
+                                                key={index+'_'+item.name}
                                                 percent={item.pre}
                                                 type="circle"
                                                 format={percent => `${percent}% ${item.name}`}
@@ -314,7 +354,15 @@ export default class ResumePage  extends Component {
                     );
                 case 'project':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='project'>
                                 <div className='Title'>
                                     <div className='Title_wrap'>
@@ -324,7 +372,7 @@ export default class ResumePage  extends Component {
                                 {
                                     i.data.map((item,project)=>{
                                         return(
-                                            <div>
+                                            <div key={project}>
                                                 <div className="project_name">
                                                     <h3>{item.name}</h3>
                                                     <strong>{item.time[0] + ' ~ ' + item.time[1]} </strong>
@@ -339,7 +387,15 @@ export default class ResumePage  extends Component {
                     );
                 case 'evaluation':
                     return (
-                        <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
+                        <div
+                            key={index}
+                            style={{
+                                height: this.state.offsetheight + 'px',
+                                backgroundRepeat:'no-repeat',
+                                backgroundSize:'cover',
+                                backgroundImage: "url(" + i.bg + ")"
+                            }}
+                        >
                             <div className='evaluation'>
                                 <div className='Title'>
                                     <div className='Title_wrap'>

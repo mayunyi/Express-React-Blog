@@ -28,9 +28,6 @@
     background:#000;
 }
 
-.resume_me{
-    background-image: url("../../static/images/resume1.png");
-}
 
 .cen_con {
     width: 50%;
@@ -125,6 +122,7 @@
     font-size: 20px;
     padding: 15px 15px 15px 150px;
     text-align: left;
+    color: white;
 }
 .school{
     width: 60%;
@@ -141,6 +139,9 @@
     font-size: 20px;
     padding: 15px 15px 15px 150px;
     text-align: left;
+}
+.Like{
+    color: white;
 }
 .Title{
     width: 60%;
@@ -210,11 +211,14 @@
     font-family: 'youyuan';
     font-size: large;
 }
+.evaluation h1{
+    color: white;
+}
 .evaluation_dec{
     width: 100%;
     margin: 0 auto 0;
     height: 300px;
-
+    color: white;
     /** 文本区域无边框 透明背景*/
     background: transparent;
     border-style: none;
