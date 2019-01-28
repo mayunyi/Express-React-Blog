@@ -132,7 +132,7 @@ export default class ResumePage  extends Component {
         }
         //   e.wheelDelta为负数时向下滑动
         if (event.wheelDelta < 0) {
-            if (this.state.fullPage >= this.state.bannerList.length) {
+            if (this.state.fullPage >= this.state.bannerList.length-1) {
                 return false;
             }
             this.setState({fullPageNum: true});
