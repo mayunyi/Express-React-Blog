@@ -18,6 +18,7 @@ export default class ResumePage  extends Component {
     }
 
     componentDidMount() {
+
         if(!this.user.userId){
             return message.warning('请登录！')
         } else{
@@ -180,7 +181,9 @@ export default class ResumePage  extends Component {
                                         </tr>
                                         <tr>
                                             <td>{`出生 | ${i.data.age}`}</td>
-                                            <td>{`QQ号 | ${i.data.qq}`}</td>
+                                            {
+                                                i.data.qq !=='' && <td>{`QQ号 | ${i.data.qq}`}</td>
+                                            }
                                         </tr>
                                         <tr>
                                             <td>{`籍贯 | ${i.data.race}`}</td>
@@ -285,8 +288,15 @@ export default class ResumePage  extends Component {
                 case 'evaluation':
                     return (
                         <div key={index} style={{'height': this.state.offsetheight + 'px', 'background': i.bg}}>
-                            <div className='userInfo'>
-
+                            <div className='evaluation'>
+                                <div className='Title'>
+                                    <div className='Title_wrap'>
+                                        <h1>自我评价</h1>
+                                    </div>
+                                </div>
+                                <textarea className="evaluation_dec" defaultValue = {i.data} disabled="false">
+                                    {/*<div dangerouslySetInnerHTML={{ __html: i.data}}/>*/}
+                                </textarea>
                             </div>
                         </div>
                     );
