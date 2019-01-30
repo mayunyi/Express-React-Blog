@@ -14,7 +14,7 @@ import '../../../node_modules/react-cropper/node_modules/cropperjs/dist/cropper.
 const Option = Select.Option;
 const FormItem = Form.Item;
 //显示照片的路径
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 class ModifyArticles extends Component{
 
     constructor(props,context){

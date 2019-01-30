@@ -9,7 +9,7 @@ import {getUser} from '../../auth';
 import Cropper from 'react-cropper';
 const FormItem = Form.Item;
 const Fragment = React.Fragment;
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 let id = 0;
 let mrId = 0;
 

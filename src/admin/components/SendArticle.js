@@ -15,7 +15,7 @@ import 'cropperjs/dist/cropper.css';
 const Option = Select.Option;
 const FormItem = Form.Item;
 
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 
 class SendArticle extends Component{
      constructor(props,context){

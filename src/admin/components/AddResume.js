@@ -11,7 +11,7 @@ const Fragment = React.Fragment;
 const { RangePicker } = DatePicker;
 
 
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 
 let sillId = 0; //新增技能是使用的id
 let shcoolId =0;

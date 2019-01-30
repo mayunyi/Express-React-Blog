@@ -8,7 +8,7 @@ import {Row, Col,Input,Form,Spin,Button,Upload,Icon,message,Modal,Radio} from 'a
 import Cropper from 'react-cropper';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 
 class PersonalCenter extends  Component {
 

@@ -15,7 +15,7 @@ const Fragment = React.Fragment;
 let sillId = 0; //新增技能是使用的id
 let schoolId =0;
 let projectId =0;
-const fileShowUrl = 'http://localhost:5000/api/upload/img';
+const fileShowUrl = 'http://www.mayunyi.top:5000/api/upload/img';
 
 class ShowAndEditResume extends Component{
 
