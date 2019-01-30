@@ -25,18 +25,18 @@ export default class ResumePage  extends Component {
     }
 
     componentDidMount() {
+        let params = this.props.match.params.id;
 
-        if(!this.user.userId){
-            return message.warning('请登录！')
-        } else{
-            //添加鼠标滑动事件
-            if (document.addEventListener) {
-                document.addEventListener('DOMMouseScroll', this.scroll.bind(this), false);
-            }
-            window.onmousewheel = document.onmousewheel = this.scroll.bind(this);
+        //添加鼠标滑动事件
+        if (document.addEventListener) {
+            document.addEventListener('DOMMouseScroll', this.scroll.bind(this), false);
+        }
+        window.onmousewheel = document.onmousewheel = this.scroll.bind(this);
+        if(params){
+            this.getResumeData(params);
+        } else {
             this.getResumeData(this.user.userId);
         }
-
     }
 
 
