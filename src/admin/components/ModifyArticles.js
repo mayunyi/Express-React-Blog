@@ -465,9 +465,9 @@ class ModifyArticles extends Component{
         croppedCanvas.toBlob(async blob => {
             if(blob){
                 // 图片name添加到blob对象里
-                let timestamp = Date.parse(new Date());
-                blob.name = timestamp + '.jpeg';
-                // blob.name = this.state.selectImgName;
+                // let timestamp = Date.parse(new Date());
+                // blob.name = timestamp + '.jpeg';
+                blob.name = this.state.selectImgName.split('.')[0]+ '.jpeg';
                 // 创建提交表单数据对象
                 const filedata = new FormData();
                 // 添加要上传的文件
