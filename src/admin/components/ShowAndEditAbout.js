@@ -327,7 +327,9 @@ class ShowAndEditAbout extends Component{
         croppedCanvas.toBlob(async blob => {
             if(blob){
                 // 图片name添加到blob对象里
-                blob.name = this.state.selectImgName;
+                let timestamp = Date.parse(new Date());
+                blob.name = timestamp + '.jpeg';
+                //blob.name = this.state.selectImgName;
                 // 创建提交表单数据对象
                 const filedata = new FormData();
                 // 添加要上传的文件
@@ -336,7 +338,7 @@ class ShowAndEditAbout extends Component{
                     imgData:filedata
                 });
             }
-        }, "image/png");
+        }, "image/jpeg");
     }
 
     handleCancelCropper = () =>{

@@ -478,7 +478,7 @@ class SendArticle extends Component{
         );
     }
     _crop(){
-        let imgData = this.refs.cropper.getCroppedCanvas().toDataURL();
+        //let imgData = this.refs.cropper.getCroppedCanvas().toDataURL();
         const croppedCanvas = this.refs.cropper.getCroppedCanvas({
             minWidth: 200,
             minHeight: 200,
@@ -490,7 +490,8 @@ class SendArticle extends Component{
         croppedCanvas.toBlob(async blob => {
             if(blob){
                 // 图片name添加到blob对象里
-                blob.name = this.state.selectImgName;
+                let timestamp = Date.parse(new Date());
+                blob.name = timestamp + '.jpeg';
                 // 创建提交表单数据对象
                 const filedata = new FormData();
                 // 添加要上传的文件
@@ -499,7 +500,7 @@ class SendArticle extends Component{
                     imgData:filedata
                 });
             }
-        }, "image/png");
+        }, "image/jpeg");
     }
     handleCancel = () =>{
         this.setState({
